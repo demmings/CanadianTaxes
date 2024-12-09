@@ -277,7 +277,7 @@ function GET_GROSS_INCOMES_V2(income, ageInFuture, currentAge, projectedInflatio
  * @returns {Number[][]}
  * @customfunction
  */
-function GET_NET_INCOMES_V2(yearlyGrossIncome, ageInFuture, currentAge = 65, inflation = null, taxYear = null, capitalGains = null, dividendIncome = null, OAS = null, pension) {
+function GET_NET_INCOMES_V2(yearlyGrossIncome, ageInFuture, currentAge = 65, inflation = null, taxYear = null, capitalGains = null, dividendIncome = null, OAS = null, pension = null) {
     const taxData = CanadianIncomeCalculator.validateIncomeSettings(yearlyGrossIncome, ageInFuture, currentAge, taxYear, inflation, capitalGains, dividendIncome, OAS, pension);
 
     return CanadianIncomeCalculator.getNetIncomes(taxData);
@@ -616,7 +616,7 @@ class CanadianIncomeTax {
     getNetProvincialTax(taxData, grossIncome) {
         taxData.ontHealthPremium = CanadianIncomeTax.calculateTaxInBracket(this.provTaxRates.ontHealthBracketInfo, taxData.totalIncomeForTaxPurposes)
         taxData.ontTaxBeforeCredits = CanadianIncomeTax.calculateTaxInBracket(this.provTaxRates.ontTaxBracketInfo, taxData.netIncomeForTaxPurposes);
-        taxData.totalProvNonRefundableTaxCreditsBeforeDividendTaxCredits = this.getProvincialTaxCredits(taxData, grossIncome + taxData.taxableCapitalGains + taxData.OAS, taxData.ageInFuture, taxData.incomeEligibleForPensionCredit, taxData.grossedUpEligibleDividends)
+        taxData.totalProvNonRefundableTaxCreditsBeforeDividendTaxCredits = this.getProvincialTaxCredits(taxData, grossIncome + taxData.taxableCapitalGains + taxData.OAS)
         if (taxData.totalProvNonRefundableTaxCreditsBeforeDividendTaxCredits > taxData.ontTaxBeforeCredits) {
             taxData.totalProvNonRefundableTaxCreditsBeforeDividendTaxCredits = taxData.ontTaxBeforeCredits;
         }
@@ -696,7 +696,7 @@ class CanadianIncomeTax {
         }
 
         taxData.provAgeCredit = this.getAgeCredit(taxData.ageInFuture, grossIncome + taxData.grossedUpEligibleDividends, this.provTaxRates.ontAgeAmount, this.provTaxRates.ontAgeThreshold, this.fedTaxRates.ageExcessPercent);
-        taxData.totalNonRefundableProvTaxCredits = this.getProvBasicPersonalAmount(taxData, grossIncome) + taxData.provAgeCredit + provincialEligiblePensionIncome;
+        taxData.totalNonRefundableProvTaxCredits = this.getProvBasicPersonalAmount(taxData) + taxData.provAgeCredit + provincialEligiblePensionIncome;
         const lowestTaxRate = CanadianIncomeTax.getMarginalTaxRate(this.provTaxRates.ontTaxBracketInfo, 0);
 
         let provincialTaxCredits = taxData.totalNonRefundableProvTaxCredits * lowestTaxRate;
@@ -707,10 +707,9 @@ class CanadianIncomeTax {
     /**
      * 
      * @param {TaxData} taxData 
-     * @param {Number} income 
      * @returns 
      */
-    getProvBasicPersonalAmount(taxData, income) {
+    getProvBasicPersonalAmount(taxData) {
         taxData.provAdjustedBPA = this.provTaxRates.ontBasicPersonAmount;
 
         return taxData.provAdjustedBPA;
