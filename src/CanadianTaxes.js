@@ -627,10 +627,9 @@ class CanadianIncomeTax {
         taxData.totalNonRefundableFedTaxCredits = totalNonRefundableFedTaxCredits;
 
         const lowestTaxRate = CanadianIncomeTax.getMarginalTaxRate(this.fedTaxRates.taxBracketInfo, 0);
-        let fedTaxCredits = totalNonRefundableFedTaxCredits * lowestTaxRate;
-        let dividendTaxCredits = grossedUpDividends * this.fedTaxRates.eligibleDividendTaxCreditRate;
-        let totalFedCredits = fedTaxCredits + dividendTaxCredits;
-        taxData.totalFedNonRefundableTaxCreditsBeforeDividendTaxCredits = fedTaxCredits;
+        taxData.totalFedNonRefundableTaxCreditsBeforeDividendTaxCredits = totalNonRefundableFedTaxCredits * lowestTaxRate;
+        const dividendTaxCredits = grossedUpDividends * this.fedTaxRates.eligibleDividendTaxCreditRate;
+        const totalFedCredits = taxData.totalFedNonRefundableTaxCreditsBeforeDividendTaxCredits + dividendTaxCredits;
 
         return totalFedCredits;
     }
@@ -672,7 +671,7 @@ class CanadianIncomeTax {
         taxData.totalNonRefundableProvTaxCredits = this.getProvBasicPersonalAmount(taxData) + taxData.provAgeCredit + provincialEligiblePensionIncome;
         const lowestTaxRate = CanadianIncomeTax.getMarginalTaxRate(this.provTaxRates.ontTaxBracketInfo, 0);
 
-        let provincialTaxCredits = taxData.totalNonRefundableProvTaxCredits * lowestTaxRate;
+        const provincialTaxCredits = taxData.totalNonRefundableProvTaxCredits * lowestTaxRate;
 
         return provincialTaxCredits;
     }
@@ -742,7 +741,7 @@ class CanadianIncomeTax {
             //  Next guess at gross income      
             const avgTaxRate = totalTax / (workingGrossIncome + fedGrossedUpDividends + taxableCapitalGains);
             const incomeDelta = diff / (1 - avgTaxRate);
-            Logger.log("totalTax=" + totalTax + ". avgTax=" + avgTaxRate + ".  Delta=" + incomeDelta);
+            Logger.log(`totalTax=${totalTax}. avgTax=${avgTaxRate}.  Delta=${incomeDelta}`);
             workingGrossIncome = workingGrossIncome + incomeDelta;
 
             totalTax = this.findTotalTax(taxData, workingGrossIncome);
@@ -754,7 +753,7 @@ class CanadianIncomeTax {
 
             diff = taxData.incomes - (workingGrossIncome - totalTax);
             failSafe++;
-            Logger.log("Net=" + taxData.incomes + ". Diff=" + diff + ". Working Gross=" + workingGrossIncome + ". Total Tax=" + totalTax + ". Failsafe=" + failSafe);
+            Logger.log(`Net=${taxData.incomes}. Diff=${diff}. Working Gross=${workingGrossIncome}. Total Tax=${totalTax}. Failsafe=${failSafe}`);
         }
 
         return workingGrossIncome;
