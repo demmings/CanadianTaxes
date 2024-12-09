@@ -26,25 +26,29 @@
 ## Using
 
 * **=TEST_CANTAX()**
-  * This custom function does an internal check and outputs the results.  Ensure there is enough empty lines below so that the custom function can expand the results.
+  * This custom function does an internal check and outputs the results.  Ensure there are enough empty lines below so that the custom function can expand the results.
+  * The test data is using 2024 tax bracket data.  The expected results column is calculated manually using the TaxTips.ca website.  https://www.taxtips.ca/calculators/canadian-tax/canadian-tax-calculator.htm
 
 * **=GET_GROSS_INCOMES_V2(income, ageInFuture, currentAge, projectedInflation, taxYear, projectedGains, projectedDividends , yearlyOAS, incomeEligibleForPensionCredit)**
    * Process a column of yearly NET INCOMES and return a column of GROSS INCOMES.
    * The GROSS INCOME is the total income from taxable sources like:  pension, RRSP, RRIF, LIF, CPP, OAS (but sources of income used as parameters to the function ARE NOT included in the total - they are used to find total tax payable)
    * The capital gains and dividends are not include in the gross income. They used to find the total tax payable.
    * The 'currentAge' uses the CURRENT TAX RATES, but future years the tax brackets are adjusted by inflation.  The assumption is that if the net income stayed the same over time, the gross income required to process that net amount will DROP.
- * **Parameters**
-   * **income** - array of net income
-   * **ageInFuture** - array of retireee age for given net income. 
-   * **currentAge** - present day age of retiree
-   * **projectedInflation** - long term projected inflation rate - used to adjust TAX BRACKETS only.
-     * We use the TAX RATES for the starting year, but can only guess the tax rates of future years.  The basic personal exeption and tax brackets are adjusted by this inflation amount.
-   * **taxYear** - tax year of present day retireee.  Used to adjust tax brackets.
-   * **projectedGains** - amount of assets sold each year subject to capital gains tax
-   * **projectedDividends** - amount of dividends received each year
-   * **yearlyOAS** - Old Age Security amount.  Used to determine clawback (which is counted as a tax)
- * **returns**  - GROSS Income from ALL taxable sources EXCLUDING capital gains and dividends, but including RRSP, CPP, OAS, ...(all taxable sources)
-   * Basically, we are trying to find how much to withdraw from RRSP so RRSP = gross - (CPP + OAS + other taxable sources)
+   * **Parameters**
+     * **income** - array of net income
+     * **ageInFuture** - array of retireee age for given net income. 
+     * **currentAge** - present day age of retiree
+     * **projectedInflation** - long term projected inflation rate - used to adjust TAX BRACKETS only.
+       * We use the TAX RATES for the starting year, but can only guess the tax rates of future years.  The basic personal exeption and tax brackets are adjusted by this inflation amount.
+     * **taxYear** - tax year of present day retireee.  Used to adjust tax brackets.
+     * **projectedGains** - amount of assets sold each year subject to capital gains tax
+     * **projectedDividends** - amount of dividends received each year
+     * **yearlyOAS** - Old Age Security amount.  Used to determine clawback (which is counted as a tax)
+   * **returns**  - GROSS Income from ALL taxable sources EXCLUDING capital gains and dividends, but including RRSP, CPP, OAS, ...(all taxable sources)
+     * Basically, we are trying to find how much to withdraw from RRSP so RRSP = gross - (CPP + OAS + other taxable sources)
+  
+ * **GET_NET_INCOMES_V2(yearlyGrossIncome, ageInFuture, currentAge, inflation, taxYear, capitalGains, dividendIncome, OAS, pension)**
+   * **Parameters** - The sames as GET_GROSS_INCOMES_V2, except the first parameter would contain gross incomes and net incomes are calculated.
 
 ## Example Usage
 
@@ -67,8 +71,14 @@
   * For example, if you have net income of $50,000 this year and also the same amount for next year - the GROSS INCOME required should be less since the brackets would have adjusted upwards for inflation.
 
 ##  Known Issues
-*   Only does taxes for Ontario Canada.
+*  Useful for tax estimation only.  Incomes to the extreme are not super accurate.
+   *  Super low incomes in Ontario will generate LIFT credits (for example) which are not calculated here.
+   *  Super high incomes may trigger the alternative minimum tax - which is not calculated here.
+   *  Future years tax brackets are estimated only.  **It's tough to make predictions, especially about the future.**
+*  Only does taxes for Ontario Canada.
     *   I have coded the js so it should be fairly easy to extended support for other provinces.
 *  Only 2024 tax brackets currently entered.
    *  However, even if this data is not updated and you use in a later year (e.g. 2026) - the tax brackets will be adjusted for inflation from 2024 to 2026.  
 *  Only a single year of tax rates are supported - it would be nice to handle this years and next (if known) -  future expansion.
+*  Spousal returns are not calculated.
+*  Many special credits that many affect your total tax bill are not calculated (at this time).
