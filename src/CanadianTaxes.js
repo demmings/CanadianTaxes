@@ -118,6 +118,9 @@ class CanadianTaxRates {
 
 }
 
+/**
+ * @classdesc - All relevant Ontario tax rates for indicated tax year.
+ */
 class OntarioTaxRates {
     constructor() {
 
@@ -471,7 +474,7 @@ class CanadianIncomeCalculator {
      * @param {Number} inflation 
      */
     static inflateBracket(bracketData, yearsToInflate, inflation) {
-        let updatedBracket = JSON.parse(JSON.stringify(bracketData));
+        const updatedBracket = JSON.parse(JSON.stringify(bracketData));
 
         for (let i = 0; i < bracketData.brackets.length; i++) {
             updatedBracket.brackets[i] = CanadianIncomeCalculator.futureValue(bracketData.brackets[i], 1, inflation, yearsToInflate);
