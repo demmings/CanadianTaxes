@@ -241,7 +241,7 @@ class OntarioTaxes extends OntarioTaxRates {
  * Basically, we are trying to find how much to withdraw from RRSP so RRSP = gross - (CPP + OAS + other taxable sources)
  * @customfunction
  */
-function GET_GROSS_INCOMES_V2(income, ageInFuture, currentAge, projectedInflation = null, taxYear = null, projectedGains = null, projectedDividends = null, yearlyOAS = null, incomeEligibleForPensionCredit = null) {
+function GET_GROSS_INCOMES_V2(income=0, ageInFuture=60, currentAge=null, projectedInflation = null, taxYear = null, projectedGains = null, projectedDividends = null, yearlyOAS = null, incomeEligibleForPensionCredit = null) {
     Logger.log("GET_GROSS_INCOMES");
 
     const taxData = CanadianIncomeCalculator.validateIncomeSettings(income, ageInFuture, currentAge, taxYear, projectedInflation, projectedGains, projectedDividends, yearlyOAS, incomeEligibleForPensionCredit);
@@ -262,7 +262,7 @@ function GET_GROSS_INCOMES_V2(income, ageInFuture, currentAge, projectedInflatio
  * @returns {Number[][]}
  * @customfunction
  */
-function GET_NET_INCOMES_V2(yearlyGrossIncome, ageInFuture, currentAge = 65, inflation = null, taxYear = null, capitalGains = null, dividendIncome = null, OAS = null, pension = null) {
+function GET_NET_INCOMES_V2(yearlyGrossIncome=0, ageInFuture=60, currentAge = null, inflation = null, taxYear = null, capitalGains = null, dividendIncome = null, OAS = null, pension = null) {
     const taxData = CanadianIncomeCalculator.validateIncomeSettings(yearlyGrossIncome, ageInFuture, currentAge, taxYear, inflation, capitalGains, dividendIncome, OAS, pension);
 
     return CanadianIncomeCalculator.getNetIncomes(taxData);
@@ -281,12 +281,14 @@ function GET_NET_INCOMES_V2(yearlyGrossIncome, ageInFuture, currentAge = 65, inf
  * @returns {Number}
  * @customfunction
  */
-function GET_INCOMETAX_V2(yearlyGrossIncome, ageInFuture, currentAge = 65, inflation = null, taxYear = null, capitalGains = null, dividendIncome = null, OAS = null, pension = null) {
+function GET_INCOMETAX_V2(yearlyGrossIncome=0, ageInFuture=60, currentAge = null, inflation = null, taxYear = null, capitalGains = null, dividendIncome = null, OAS = null, pension = null) {
     const taxData = CanadianIncomeCalculator.validateIncomeSettings(yearlyGrossIncome, ageInFuture, currentAge, taxYear, inflation, capitalGains, dividendIncome, OAS, pension);
+    const taxItem = taxData.getTaxItem(0);
+    const taxCalc = new CanadianIncomeTax(taxItem.year, taxItem.inflation);
+    const taxes = taxCalc.findTotalTax(taxItem, yearlyGrossIncome);
+    CanadianIncomeCalculator.logTaxSummary(taxItem);
 
-    const taxCalc = new CanadianIncomeTax(taxData.year, taxData.inflation);
-
-    return taxCalc.findTotalTax(taxData, yearlyGrossIncome);
+    return taxes;
 }
 
 class CanadianIncomeCalculator {
@@ -356,7 +358,7 @@ class CanadianIncomeCalculator {
         const OAS = CanadianIncomeCalculator.prepTaxInput(yearlyIncome, yearlyOAS);
         const incomeEligibleForPensionCredit = CanadianIncomeCalculator.prepTaxInput(yearlyIncome, pensionIncome);
 
-        const currentAge = age === null ? 60 : Number(age);
+        const currentAge = age === null ? (Array.isArray(ageInFuture) ? ageInFuture[0] : ageInFuture  ): Number(age);
         const inflation = inflationPercent === null ? 0 : Number(inflationPercent);
         const year = taxYear === null || taxYear === '' || typeof taxYear === 'undefined' ? new Date().getFullYear() : Number(taxYear);
 
