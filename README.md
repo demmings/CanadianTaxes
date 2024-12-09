@@ -8,6 +8,13 @@
 * A Google Sheets custom function used for doing retirement income projections and taking Canadian taxes into the equation.
 * Take a column of **NET INCOMES** and calculate as accurately as possible the amount of **GROSS INCOMES** that would be required in **Canada** (and **ONTARIO**) to have the required net income.
 * There is also the option of doing the opposite on finding net incomes from gross incomes.
+* The factors taken into consideration for finding gross/net income:
+  * Regular taxable income (like RRSP, CPP, OAS,...)
+  * Age credits
+  * Capital gains
+  * Eligible Canadian Dividends
+  * OAS clawbacks
+  * Pension credit eligible income
 
 
 ## Installing
@@ -49,6 +56,7 @@
      * **projectedGains** - amount of assets sold each year subject to capital gains tax
      * **projectedDividends** - amount of dividends received each year
      * **yearlyOAS** - Old Age Security amount.  Used to determine clawback (which is counted as a tax)
+     * **incomeEligibleForPensionCredit** - Pension credit eligible income.  This will add to the tax credits up to a specific amount.
    * **returns**  - GROSS Income from ALL taxable sources EXCLUDING capital gains and dividends, but including RRSP, CPP, OAS, ...(all taxable sources)
      * Basically, we are trying to find how much to withdraw from RRSP so RRSP = gross - (CPP + OAS + other taxable sources)
   
