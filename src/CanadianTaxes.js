@@ -284,52 +284,24 @@ function GET_NET_INCOMES_V2(yearlyGrossIncome, ageInFuture, currentAge = 65, inf
 }
 
 /**
- * Find approximate tax payable.
- * @param {number} grossIncome 
- * @param {number} age 
- * @param {Number} dividends
- * @returns {number}
+ * 
+ * @param {any} yearlyGrossIncome 
+ * @param {any} ageInFuture 
+ * @param {Number} currentAge
+ * @param {Number} inflation
+ * @param {Number} taxYear
+ * @param {any} capitalGains
+ * @param {any} dividendIncome
+ * @param {any} pension
+ * @returns {Number}
  * @customfunction
  */
-function GET_INCOMETAX_V2(grossIncome, age = 60, dividends = 0, eligibleCapitalGains = 0) {
-    const taxData = CanadianIncomeCalculator.validateIncomeSettings(grossIncome, age, age, null, 0, eligibleCapitalGains, dividends, 0, 0);
+function GET_INCOMETAX_V2(yearlyGrossIncome, ageInFuture, currentAge = 65, inflation = null, taxYear = null, capitalGains = null, dividendIncome = null, OAS = null, pension = null) {
+    const taxData = CanadianIncomeCalculator.validateIncomeSettings(yearlyGrossIncome, ageInFuture, currentAge, taxYear, inflation, capitalGains, dividendIncome, OAS, pension);
+
     const taxCalc = new CanadianIncomeTax(taxData.year, taxData.inflation);
 
-    return taxCalc.findTotalTax(taxData, grossIncome);
-}
-
-/**
- * 
- * @param {Number} grossIncome 
- * @param {Number} age 
- * @param {Number} incomeEligibleForPensionCredit 
- * @param {Number} dividends
- * @param {Number} eligibleCapitalGains
- * @returns {Number}
- * @customfunction
- */
-function NET_FEDERAL_TAX_V2(grossIncome, age, incomeEligibleForPensionCredit = 0, dividends = 0, eligibleCapitalGains = 0) {
-    const taxData = CanadianIncomeCalculator.validateIncomeSettings(grossIncome, age, age, null, 0, eligibleCapitalGains, dividends, 0, 0);
-    const tax = new CanadianIncomeTax(taxData.year, taxData.inflation);
-
-    return tax.getNetFederalTax(taxData, grossIncome);
-}
-
-/**
- * 
- * @param {Number} grossIncome 
- * @param {Number} age 
- * @param {Number} incomeEligibleForPensionCredit 
- * @param {Number} dividends
- * @param {Number} eligibleCapitalGains
- * @returns {Number}
- * @customfunction
- */
-function NET_PROVINCIAL_TAX_V2(grossIncome, age, incomeEligibleForPensionCredit = 0, dividends = 0, eligibleCapitalGains = 0, OAS = 0) {
-    const taxData = CanadianIncomeCalculator.validateIncomeSettings(grossIncome, age, age, null, 0, eligibleCapitalGains, dividends, 0, 0);
-    const tax = new CanadianIncomeTax(taxData.year, taxData.inflation);
-
-    return tax.getNetProvincialTax(taxData, grossIncome);
+    return taxCalc.findTotalTax(taxData, yearlyGrossIncome);
 }
 
 class CanadianIncomeCalculator {

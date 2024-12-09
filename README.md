@@ -5,8 +5,9 @@
 
 ## Purpose
 
-* Take a column of **NET INCOMES** and calculate as accurately as possible the amount of **GROSS INCOMES** that would be required in **Canada** (and **ONTARIO**) to have the required net income.
 * A Google Sheets custom function used for doing retirement income projections and taking Canadian taxes into the equation.
+* Take a column of **NET INCOMES** and calculate as accurately as possible the amount of **GROSS INCOMES** that would be required in **Canada** (and **ONTARIO**) to have the required net income.
+* There is also the option of doing the opposite on finding net incomes from gross incomes.
 
 
 ## Installing
