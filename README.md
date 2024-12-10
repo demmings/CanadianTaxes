@@ -1,4 +1,9 @@
+[![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-light.svg)](https://sonarcloud.io/summary/new_code?id=demmings_CanadianTaxes)
 [![DeepSource](https://deepsource.io/gh/demmings/CanadianTaxes.svg/?label=active+issues&show_trend=true&token=uIplDc6IW1XQfmDks0l97l4C)](https://deepsource.io/gh/demmings/CanadianTaxes/?ref=repository-badge)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=demmings_CanadianTaxes&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=demmings_CanadianTaxes)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=demmings_CanadianTaxes&metric=bugs)](https://sonarcloud.io/summary/new_code?id=demmings_CanadianTaxes)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=demmings_CanadianTaxes&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=demmings_CanadianTaxes)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=demmings_CanadianTaxes&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=demmings_CanadianTaxes)
 
 
 # CanadianTaxes
