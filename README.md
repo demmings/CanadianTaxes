@@ -4,6 +4,7 @@
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=demmings_CanadianTaxes&metric=bugs)](https://sonarcloud.io/summary/new_code?id=demmings_CanadianTaxes)
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=demmings_CanadianTaxes&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=demmings_CanadianTaxes)
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=demmings_CanadianTaxes&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=demmings_CanadianTaxes)
+[![DeepScan grade](https://deepscan.io/api/teams/20362/projects/28447/branches/917017/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=20362&pid=28447&bid=917017)
 
 
 # CanadianTaxes
