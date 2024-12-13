@@ -92,32 +92,33 @@
 * We have received **$9,416** in old age security payments (OAS)
 * **$2,000** of our total income is from pension credit eligible taxable income.
 
-Results ==>  **63613.38213**
+Results ==>  **58,824.22**
 
 * Taxtips data entry and interpretation of results.
 * [TaxTips.ca](https://www.taxtips.ca/calculators/canadian-tax/canadian-tax-calculator.htm)
   * Enter the following fields: 
     * Taxpayer birthyear ==> **1954**
     * Are you single? ==> **yes**
-    * Old Age Security (OAS) (T4A(OAS) box 18) ==> **9416**
-    * Cdn dividends eligible for enhanced div tax credit (T5 box 24) ==> **5000**
-    * RRSP/RRIF withdrawals (when not eligible for pension tax credit) ==> **61613**
-      * The 63,613 is our total taxable income - which is $61,613 + $2,000 pension income
-    * Pension income (eligible for pension tax credit for persons 65+, pension splitting) ==> **2000**
+    * Old Age Security (OAS) (T4A(OAS) box 18) ==> **9,416**
+    * Cdn dividends eligible for enhanced div tax credit (T5 box 24) ==> **5,000**
+    * RRSP/RRIF withdrawals (when not eligible for pension tax credit) ==> **47,408**
+      * The $58,824 is our total taxable gross income.  All of our taxable lines must add up to this value.
+        * RRSP/RRIF = 58,824 - 9,416 (oas) - 2,000 (pension) ==>  $47,408 
+    * Pension income (eligible for pension tax credit for persons 65+, pension splitting) ==> **2,000**
   * See results of calculation at bottom:
-    * Total taxes, clawbacks, CPP/EI premiums ==> **13613**
+    * Total taxes, clawbacks, CPP/EI premiums ==> **8,824**
 
 ### Results Interpretation.
-  * RRSP Withdrawal = 63,613 - (9416 + 2000) =  **$52,197**  
-    * If there is other taxable income such as CPP or taxable annuities, those amounts should be deducted from 52,197 to find the actual RSP withdrawal
-  * Our Net Income = 63,613 - 13,613 = **$50,000**
+  * RRSP Withdrawal = 58,824 - (9416 + 2000) =  **$47,408**  
+    * If there is other taxable income such as CPP or taxable annuities, those amounts should be deducted from 58,824 to find the actual RSP withdrawal
+  * Our Net Income = 58,824 - 8,824 (taxes) = **$50,000**
   * The entire purpose of **GET_GROSS_INCOMES_V2()** is to find how much to be withdrawn from our RRSP and then subtract these amounts from our projected RRSP total asset value until we arrive at a specific value at some point in the future.
   * For example, you may wish to have ZERO RRSP assets the year after your turn 85 - so you can solve for that.
     * For my approach to RRSP meltdown strategy, see (https://demmings.github.io/canadiantaxes/2024/12/10/DIY-Calculating-future-RRSP-withdrawals.html)
   * Adding CPP into TAXTIPS.
-    * Any other taxable data entered into TAXTIPS - like your CPP - you then need to subtract from **RRSP/RRIF withdrawals** entry - just like we did with the pension income.
-    * The total taxable income for all lines must add up to $63613 (from our custom function result)
-    * The reason we have an OAS parameter to the function and NOT CPP is that CPP is  plain taxable income.  OAS is special.  Yes it is added as income but if your income is too high, it is clawed back - which changes our overall tax bill.
+    * Any other taxable data entered into TAXTIPS - like your CPP - you then need to subtract from **RRSP/RRIF withdrawals** entry - just like we did with the pension income and OAS.
+    * The total taxable income for all lines must add up to $58,824 (from our custom function result)
+    * The reason we have an OAS parameter to the function and NOT CPP is that CPP is plain taxable income.  OAS is special.  Yes it is added as income but if your income is too high, it is clawed back - which changes our overall tax bill.
 
 
 ## Guiding Principle
