@@ -1,1 +1,5 @@
 *.sh
+appsscript.json
+.clasp.json
+.claspignore
+.gitignore

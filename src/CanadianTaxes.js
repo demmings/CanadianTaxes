@@ -2,7 +2,7 @@
 //  Remove comments for testing in NODE
 
 function getGross() {
-    const val = GET_GROSS_INCOMES_V2(62237, 65, 65, 0, 2024, 0, 0, 8732, 2000);
+    const val = GET_GROSS_INCOMES_V2([[62237], [50000]], 65, 65, 2, 2024, 0, 0, 8732, 2000, 0);
     Logger.log("Gross=" + val);
 }
 
@@ -65,7 +65,7 @@ const TestCantaxData =
 function TEST_CANTAX() {
     const output = [["Age", "Net Income", "Dividends", "Eligible Capital Gains", "OAS", "Pension Credit Eligible Income", "Gross Income (calculated)", "Expected Gross", "Gross Diff. (calc-expected)", "Pass/Fail", "Net Income (calculated)", "Gross Diff. (calc-expected)", "Pass/Fail"]];
     for (const testItem of TestCantaxData) {
-        const grossIncome = GET_GROSS_INCOMES_V2(testItem[1], testItem[0], 59, 0, 2024, testItem[4], testItem[3], testItem[5], testItem[6]);
+        const grossIncome = GET_GROSS_INCOMES_V2(testItem[1], testItem[0], 59, 0, 2024, testItem[4], testItem[3], testItem[5], testItem[6], 0);
         const netIncome = GET_NET_INCOMES_V2(testItem[2], testItem[0], 59, 0, 2024, testItem[4], testItem[3], testItem[5], testItem[6]);
 
         const grossDiff = Math.round(grossIncome[0][0]) - testItem[2];
@@ -99,6 +99,8 @@ class CanadianTaxRates {
         this.maxIncomePensionTaxCredit = 2000;
         this.OASclawbackThreshold = 90997;
         this.OASclawbackRate = 0.15;
+        this.medicalExpenseThreshold = 2759;
+        this.medicalExpenseThresholdPercent = 0.03;
 
         /**
          * @type {BracketObject}
@@ -190,6 +192,7 @@ class FederalTaxes extends CanadianTaxRates {
         this.ageThreshold = CanadianIncomeCalculator.futureValue(this.ageThreshold, 1, inflation, yearsToInflate);
         this.OASclawbackThreshold = CanadianIncomeCalculator.futureValue(this.OASclawbackThreshold, 1, inflation, yearsToInflate);
         this.taxBracketInfo = CanadianIncomeCalculator.inflateBracket(this.taxBracketInfo, yearsToInflate, inflation);
+        this.medicalExpenseThreshold = CanadianIncomeCalculator.futureValue(this.medicalExpenseThreshold, 1, inflation, yearsToInflate);
     }
 }
 
@@ -239,10 +242,15 @@ class OntarioTaxes extends OntarioTaxRates {
  * @property {Number} subtotalFederalAndProvIncomeTaxes
  * @property {Number} totalTaxesClawbacksAndCPP
  * @property {Number} federalAgeCredit
+ * @property {Number} fedEligiblePensionIncome
+ * @property {Number} provincialEligiblePensionIncome
  * @property {Number} provAgeCredit
  * @property {Number} ontHealthPremium
  * @property {Number} grossedUpEligibleDividends
  * @property {Number} taxableCapitalGains
+ * @property {Number} medicalExpenses
+ * @property {Number} fedMedicalExpenseCreditAmount
+ * @property {Number} provincialMedicalExpenseCredit
  * @property {Boolean} debug
  * @property {function} getTaxItem
  */
@@ -265,14 +273,16 @@ class OntarioTaxes extends OntarioTaxRates {
  * @param {any} projectedGains - amount of assets sold each year subject to capital gains tax
  * @param {any} projectedDividends - amount of dividends received each year
  * @param {any} yearlyOAS - Old Age Security amount.  Used to determine clawback (which is counted as a tax)
+ * @param {any} incomeEligibleForPensionCredit - income that qualifies as pension credit eligible income
+ * @param {any} medicalExpenses
  * @returns {Number[][]} - GROSS Income from ALL taxable sources EXCLUDING capital gains and dividends, but including RRSP, CPP, OAS, ...(all taxable sources)
  * Basically, we are trying to find how much to withdraw from RRSP so RRSP = gross - (CPP + OAS + other taxable sources)
  * @customfunction
  */
-function GET_GROSS_INCOMES_V2(income = 0, ageInFuture = 60, currentAge = null, projectedInflation = null, taxYear = null, projectedGains = null, projectedDividends = null, yearlyOAS = null, incomeEligibleForPensionCredit = null, debug=true) {
+function GET_GROSS_INCOMES_V2(income = 0, ageInFuture = 60, currentAge = null, projectedInflation = null, taxYear = null, projectedGains = null, projectedDividends = null, yearlyOAS = null, incomeEligibleForPensionCredit = null, medicalExpenses = null, debug = true) {
     if (debug) Logger.log("GET_GROSS_INCOMES");
 
-    const taxData = CanadianIncomeCalculator.validateIncomeSettings(income, ageInFuture, currentAge, taxYear, projectedInflation, projectedGains, projectedDividends, yearlyOAS, incomeEligibleForPensionCredit, debug);
+    const taxData = CanadianIncomeCalculator.validateIncomeSettings(income, ageInFuture, currentAge, taxYear, projectedInflation, projectedGains, projectedDividends, yearlyOAS, incomeEligibleForPensionCredit, medicalExpenses, debug);
 
     return CanadianIncomeCalculator.getGrossIncomes(taxData);
 }
@@ -287,11 +297,13 @@ function GET_GROSS_INCOMES_V2(income = 0, ageInFuture = 60, currentAge = null, p
  * @param {any} capitalGains
  * @param {any} dividendIncome
  * @param {any} pension
+ * @param {any} medicalExpenses
+ * @param {any} debug
  * @returns {Number[][]}
  * @customfunction
  */
-function GET_NET_INCOMES_V2(yearlyGrossIncome = 0, ageInFuture = 60, currentAge = null, inflation = null, taxYear = null, capitalGains = null, dividendIncome = null, OAS = null, pension = null) {
-    const taxData = CanadianIncomeCalculator.validateIncomeSettings(yearlyGrossIncome, ageInFuture, currentAge, taxYear, inflation, capitalGains, dividendIncome, OAS, pension);
+function GET_NET_INCOMES_V2(yearlyGrossIncome = 0, ageInFuture = 60, currentAge = null, inflation = null, taxYear = null, capitalGains = null, dividendIncome = null, OAS = null, pension = null, medicalExpenses = null, debug = true) {
+    const taxData = CanadianIncomeCalculator.validateIncomeSettings(yearlyGrossIncome, ageInFuture, currentAge, taxYear, inflation, capitalGains, dividendIncome, OAS, pension, medicalExpenses, debug);
 
     return CanadianIncomeCalculator.getNetIncomes(taxData);
 }
@@ -378,19 +390,22 @@ class CanadianIncomeCalculator {
      * @param {any} pensionIncome
      * @returns {TaxData}
      */
-    static validateIncomeSettings(yearlyIncome, ageOfRetiree, age, taxYear, inflationPercent, gains, dividends, yearlyOAS, pensionIncome, debug) {
-        const incomes = CanadianIncomeCalculator.prepTaxInput(yearlyIncome, yearlyIncome);
-        const ageInFuture = CanadianIncomeCalculator.prepTaxInput(yearlyIncome, ageOfRetiree);
-        const capitalGains = CanadianIncomeCalculator.prepTaxInput(yearlyIncome, gains);
-        const eligibleDividends = CanadianIncomeCalculator.prepTaxInput(yearlyIncome, dividends);
-        const OAS = CanadianIncomeCalculator.prepTaxInput(yearlyIncome, yearlyOAS);
-        const incomeEligibleForPensionCredit = CanadianIncomeCalculator.prepTaxInput(yearlyIncome, pensionIncome);
-
-        const currentAge = age === null ? (Array.isArray(ageInFuture) ? ageInFuture[0] : ageInFuture) : Number(age);
+    static validateIncomeSettings(yearlyIncome, ageOfRetiree, age, taxYear, inflationPercent, gains, dividends, yearlyOAS, pensionIncome, medicalCosts, debug) {
+        const items = Array.isArray(yearlyIncome) ? yearlyIncome.length : 1;
         const inflation = inflationPercent === null ? 0 : Number(inflationPercent);
+    
+        const incomes = CanadianIncomeCalculator.prepTaxInput(items, inflation, yearlyIncome);
+        const ageInFuture = CanadianIncomeCalculator.prepTaxInput(items, null, ageOfRetiree);
+        const capitalGains = CanadianIncomeCalculator.prepTaxInput(items, inflation, gains);
+        const eligibleDividends = CanadianIncomeCalculator.prepTaxInput(items, inflation, dividends);
+        const OAS = CanadianIncomeCalculator.prepTaxInput(items, inflation, yearlyOAS);
+        const incomeEligibleForPensionCredit = CanadianIncomeCalculator.prepTaxInput(items, inflation, pensionIncome);
+        const medicalExpenses = CanadianIncomeCalculator.prepTaxInput(items, inflation, medicalCosts);
+    
+        const currentAge = age === null ? (Array.isArray(ageInFuture) ? ageInFuture[0] : ageInFuture) : Number(age);
         const year = taxYear === null || taxYear === '' || typeof taxYear === 'undefined' ? new Date().getFullYear() : Number(taxYear);
 
-        const taxData = { incomes, ageInFuture, currentAge, year, inflation, capitalGains, eligibleDividends, OAS, incomeEligibleForPensionCredit, debug };
+        const taxData = { incomes, ageInFuture, currentAge, year, inflation, capitalGains, eligibleDividends, OAS, incomeEligibleForPensionCredit, medicalExpenses, debug };
 
         /**
          * 
@@ -408,7 +423,9 @@ class CanadianIncomeCalculator {
                 capitalGains: this.capitalGains[i],
                 eligibleDividends: this.eligibleDividends[i],
                 OAS: this.OAS[i],
-                incomeEligibleForPensionCredit: this.incomeEligibleForPensionCredit[i]
+                incomeEligibleForPensionCredit: this.incomeEligibleForPensionCredit[i],
+                medicalExpenses: this.medicalExpenses[i],
+                debug: this.debug
             };
         }
 
@@ -417,20 +434,25 @@ class CanadianIncomeCalculator {
     }
 
     /**
-     * @param {any} yearlyIncome
+     * If 'val' is not an array and 'items' > 1, val will be replicated for 'items' length and adjusted
+     * for 'inflation'
+     * @param {any} items
+     * @param {Number} inflation - rate (2% entered as 2). null - increment by one instead of inflate.
      * @param {any} val 
      * @returns {Number[]}
      */
-    static prepTaxInput(yearlyIncome, val) {
+    static prepTaxInput(items, inflation, val) {
         let taxProperty = [];
         if (Array.isArray(val)) {
             taxProperty = CanadianIncomeCalculator.convertRowsToSingleArray(val).map(inc => Number(inc));
         }
         else {
-            taxProperty = [val === null ? 0 : Number(val)];
+            let startVal = val === null ? 0 : Number(val);
 
-            if (Array.isArray(yearlyIncome)) {
-                taxProperty = Array(yearlyIncome.length).fill(0);
+            for (let i = 0; i < items; i++) {
+                taxProperty.push(startVal);
+
+                startVal = inflation === null ? startVal+1 :  startVal * (1 + inflation / 100);
             }
         }
 
@@ -503,7 +525,7 @@ class CanadianIncomeCalculator {
      * @param {TaxData} taxData 
      */
     static logTaxSummary(taxData) {
-        if (! taxData.debug) {
+        if (!taxData.debug) {
             return;
         }
         Logger.log("============  T A X   S U M M A R Y  ============");
@@ -515,6 +537,8 @@ class CanadianIncomeCalculator {
         Logger.log(`Tax before non-refundable tax credits (A) Line 40400. Fed = ${taxData.federalTaxBeforeCredits}. Prov = ${taxData.ontTaxBeforeCredits}`);
         Logger.log(`Basic personal amount Line 30000.  Fed = ${taxData.AdjustedBPA}, Prov = ${taxData.provAdjustedBPA}`);
         Logger.log(`Age amount (reduced above certain income levels) Line 30100. Fed = ${taxData.federalAgeCredit}.  Prov = ${taxData.provAgeCredit}`)
+        Logger.log(`Pension amount Line 31400. Fed = ${taxData.fedEligiblePensionIncome}. Prov = ${taxData.provincialEligiblePensionIncome}`);
+        Logger.log(`Medical expenses Line 33099.  Fed = ${taxData.fedMedicalExpenseCreditAmount}.  Prov = ${taxData.provincialMedicalExpenseCredit}`);
         Logger.log(`Subtotal for non-refundable tax credits (B) Line 33500.  Fed = ${taxData.totalNonRefundableFedTaxCredits}, Prov = ${taxData.totalNonRefundableProvTaxCredits}`);
         Logger.log(`Total non-refundable tax credits before dividend tax credits Line 35000.  Fed = ${taxData.totalFedNonRefundableTaxCreditsBeforeDividendTaxCredits}.  Prov=${taxData.totalProvNonRefundableTaxCreditsBeforeDividendTaxCredits}`);
         Logger.log(`Fed Line 42000 Net federal tax = ${taxData.netFederalTax}`);
@@ -632,19 +656,17 @@ class CanadianIncomeTax {
      * @returns {Number}
      */
     getFederalTaxCredits(taxData, grossIncome, age, incomeEligibleForPensionCredit, grossedUpDividends) {
-        let fedEligiblePensionIncome = incomeEligibleForPensionCredit;
-        if (fedEligiblePensionIncome > this.fedTaxRates.maxIncomePensionTaxCredit) {
-            fedEligiblePensionIncome = this.fedTaxRates.maxIncomePensionTaxCredit;
-        }
+        taxData.fedEligiblePensionIncome = incomeEligibleForPensionCredit > this.fedTaxRates.maxIncomePensionTaxCredit
+            ? this.fedTaxRates.maxIncomePensionTaxCredit
+            : incomeEligibleForPensionCredit;
 
-        const fedAgeCredits = this.getAgeCredit(age, grossIncome + grossedUpDividends, this.fedTaxRates.ageAmount, this.fedTaxRates.ageThreshold, this.fedTaxRates.ageExcessPercent);
-        taxData.federalAgeCredit = fedAgeCredits;
-        const fedBasicPersonalAmount = this.getFederalBasicPersonalAmount(taxData, grossIncome + grossedUpDividends);
-        const totalNonRefundableFedTaxCredits = fedBasicPersonalAmount + fedAgeCredits + fedEligiblePensionIncome;
-        taxData.totalNonRefundableFedTaxCredits = totalNonRefundableFedTaxCredits;
+        taxData.federalAgeCredit = this.getAgeCredit(age, grossIncome + grossedUpDividends, this.fedTaxRates.ageAmount, this.fedTaxRates.ageThreshold, this.fedTaxRates.ageExcessPercent);
+        taxData.AdjustedBPA = this.getFederalBasicPersonalAmount(taxData, grossIncome + grossedUpDividends);
+        taxData.fedMedicalExpenseCreditAmount = this.getFederalMedicalExpenseCredit(taxData);
+        taxData.totalNonRefundableFedTaxCredits = taxData.AdjustedBPA + taxData.federalAgeCredit + taxData.fedEligiblePensionIncome + taxData.fedMedicalExpenseCreditAmount;
 
         const lowestTaxRate = CanadianIncomeTax.getMarginalTaxRate(this.fedTaxRates.taxBracketInfo, 0);
-        taxData.totalFedNonRefundableTaxCreditsBeforeDividendTaxCredits = totalNonRefundableFedTaxCredits * lowestTaxRate;
+        taxData.totalFedNonRefundableTaxCreditsBeforeDividendTaxCredits = taxData.totalNonRefundableFedTaxCredits * lowestTaxRate;
         const dividendTaxCredits = grossedUpDividends * this.fedTaxRates.eligibleDividendTaxCreditRate;
         const totalFedCredits = taxData.totalFedNonRefundableTaxCreditsBeforeDividendTaxCredits + dividendTaxCredits;
 
@@ -668,9 +690,24 @@ class CanadianIncomeTax {
         }
 
         const adjustedBasicPersonalAmount = this.fedTaxRates.basicPersonAmount - reduction;
-        taxData.AdjustedBPA = adjustedBasicPersonalAmount;
 
         return adjustedBasicPersonalAmount;
+    }
+
+    /**
+     * 
+     * @param {TaxData} taxData 
+     * @returns {Number}
+     */
+    getFederalMedicalExpenseCredit(taxData) {
+        let thresholdValue = taxData.netIncomeForTaxPurposes * this.fedTaxRates.medicalExpenseThresholdPercent;
+        thresholdValue = this.fedTaxRates.medicalExpenseThreshold < thresholdValue
+            ? this.fedTaxRates.medicalExpenseThreshold
+            : thresholdValue;
+
+        const medicalExpenseCreditAmount = taxData.medicalExpenses - thresholdValue;
+
+        return medicalExpenseCreditAmount <= 0 ? 0 : medicalExpenseCreditAmount;
     }
 
     /**
@@ -679,13 +716,14 @@ class CanadianIncomeTax {
      * @returns {Number}
      */
     getProvincialTaxCredits(taxData, grossIncome) {
-        let provincialEligiblePensionIncome = taxData.incomeEligibleForPensionCredit;
-        if (provincialEligiblePensionIncome > this.provTaxRates.provMaxIncomePensionTaxCredit) {
-            provincialEligiblePensionIncome = this.provTaxRates.provMaxIncomePensionTaxCredit;
-        }
+        taxData.provincialEligiblePensionIncome = taxData.incomeEligibleForPensionCredit > this.provTaxRates.provMaxIncomePensionTaxCredit
+            ? this.provTaxRates.provMaxIncomePensionTaxCredit
+            : taxData.incomeEligibleForPensionCredit;
 
         taxData.provAgeCredit = this.getAgeCredit(taxData.ageInFuture, grossIncome + taxData.grossedUpEligibleDividends, this.provTaxRates.ontAgeAmount, this.provTaxRates.ontAgeThreshold, this.fedTaxRates.ageExcessPercent);
-        taxData.totalNonRefundableProvTaxCredits = this.getProvBasicPersonalAmount(taxData) + taxData.provAgeCredit + provincialEligiblePensionIncome;
+        taxData.provincialMedicalExpenseCredit = this.getProvincialMedicalExpenseCredit(taxData);
+        taxData.provAdjustedBPA = this.getProvBasicPersonalAmount(taxData);
+        taxData.totalNonRefundableProvTaxCredits = taxData.provAdjustedBPA + taxData.provAgeCredit + taxData.provincialEligiblePensionIncome + taxData.provincialMedicalExpenseCredit;
         const lowestTaxRate = CanadianIncomeTax.getMarginalTaxRate(this.provTaxRates.ontTaxBracketInfo, 0);
 
         const provincialTaxCredits = taxData.totalNonRefundableProvTaxCredits * lowestTaxRate;
@@ -699,9 +737,7 @@ class CanadianIncomeTax {
      * @returns 
      */
     getProvBasicPersonalAmount(taxData) {
-        taxData.provAdjustedBPA = this.provTaxRates.ontBasicPersonAmount;
-
-        return taxData.provAdjustedBPA;
+        return this.provTaxRates.ontBasicPersonAmount;
     }
 
     /**
@@ -729,6 +765,16 @@ class CanadianIncomeTax {
         }
 
         return ageCredit;
+    }
+
+    /**
+     * 
+     * @param {TaxData} taxData 
+     * @returns {Number}
+     */
+    getProvincialMedicalExpenseCredit(taxData) {
+        //  Same as federal for now.
+        return taxData.fedMedicalExpenseCreditAmount;
     }
 
     /**
@@ -841,8 +887,8 @@ class CanadianIncomeTax {
 function taxTester() {
     console.log("Starting Canadian Tax Test");
     for (const testItem of TestCantaxData) {
-        const grossIncome = GET_GROSS_INCOMES_V2(testItem[1], testItem[0], 59, 0, 2024, testItem[4], testItem[3], testItem[5], testItem[6], false);
-        const grossRounded = Math.round(grossIncome[0][0]); 
+        const grossIncome = GET_GROSS_INCOMES_V2(testItem[1], testItem[0], 59, 0, 2024, testItem[4], testItem[3], testItem[5], testItem[6], 0, false);
+        const grossRounded = Math.round(grossIncome[0][0]);
         const grossDiff = grossRounded - testItem[2];
         const successMsg = grossDiff <= 1.0 ? "Success" : "Fail";
 
