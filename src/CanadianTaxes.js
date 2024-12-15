@@ -721,7 +721,7 @@ class CanadianIncomeTax {
             : taxData.incomeEligibleForPensionCredit;
 
         taxData.provAgeCredit = this.getAgeCredit(taxData.ageInFuture, grossIncome + taxData.grossedUpEligibleDividends, this.provTaxRates.ontAgeAmount, this.provTaxRates.ontAgeThreshold, this.fedTaxRates.ageExcessPercent);
-        taxData.provincialMedicalExpenseCredit = this.getProvincialMedicalExpenseCredit(taxData);
+        taxData.provincialMedicalExpenseCredit = CanadianIncomeTax.getProvincialMedicalExpenseCredit(taxData);
         taxData.provAdjustedBPA = this.getProvBasicPersonalAmount(taxData);
         taxData.totalNonRefundableProvTaxCredits = taxData.provAdjustedBPA + taxData.provAgeCredit + taxData.provincialEligiblePensionIncome + taxData.provincialMedicalExpenseCredit;
         const lowestTaxRate = CanadianIncomeTax.getMarginalTaxRate(this.provTaxRates.ontTaxBracketInfo, 0);
@@ -772,7 +772,7 @@ class CanadianIncomeTax {
      * @param {TaxData} taxData 
      * @returns {Number}
      */
-    getProvincialMedicalExpenseCredit(taxData) {
+    static getProvincialMedicalExpenseCredit(taxData) {
         //  Same as federal for now.
         return taxData.fedMedicalExpenseCreditAmount;
     }
