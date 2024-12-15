@@ -21,6 +21,7 @@
   * Eligible Canadian Dividends
   * OAS clawbacks
   * Pension credit eligible income
+  * Medical Expenses
 
 
 ## Installing
@@ -47,7 +48,7 @@
   * This custom function does an internal check and outputs the results.  Ensure there are enough empty lines below so that the custom function can expand the results.
   * The test data is using 2024 tax bracket data.  The expected results column is calculated manually using the TaxTips.ca website.  https://www.taxtips.ca/calculators/canadian-tax/canadian-tax-calculator.htm
 
-* **=GET_GROSS_INCOMES_V2(income, ageInFuture, currentAge, projectedInflation, taxYear, projectedGains, projectedDividends , yearlyOAS, incomeEligibleForPensionCredit)**
+* **=GET_GROSS_INCOMES_V2(income, ageInFuture, currentAge, projectedInflation, taxYear, projectedGains, projectedDividends , yearlyOAS, incomeEligibleForPensionCredit, medicalExpenses)**
    * Process a column of yearly NET INCOMES and return a column of GROSS INCOMES.
    * The GROSS INCOME is the total income from taxable sources like:  pension, RRSP, RRIF, LIF, CPP, OAS (but sources of income used as parameters to the function ARE NOT included in the total - they are used to find total tax payable)
    * The capital gains and dividends are not include in the gross income. They used to find the total tax payable.
@@ -63,10 +64,11 @@
      * **projectedDividends** - amount of dividends received each year
      * **yearlyOAS** - Old Age Security amount.  Used to determine clawback (which is counted as a tax)
      * **incomeEligibleForPensionCredit** - Pension credit eligible income.  This will add to the tax credits up to a specific amount.
+     * **medicalExpenses** - Expected yearly medical expenses
    * **returns**  - GROSS Income from ALL taxable sources EXCLUDING capital gains and dividends, but including RRSP, CPP, OAS, ...(all taxable sources)
      * Basically, we are trying to find how much to withdraw from RRSP so RRSP = gross - (CPP + OAS + other taxable sources)
   
- * **GET_NET_INCOMES_V2(yearlyGrossIncome, ageInFuture, currentAge, inflation, taxYear, capitalGains, dividendIncome, OAS, pension)**
+ * **GET_NET_INCOMES_V2(yearlyGrossIncome, ageInFuture, currentAge, inflation, taxYear, capitalGains, dividendIncome, OAS, pension, medicalExpenses)**
    * **Parameters** - The sames as GET_GROSS_INCOMES_V2, except the first parameter would contain gross incomes and net incomes are calculated.
 
 ## Example Usage
@@ -85,12 +87,13 @@
 
 ## Example Case for GET_GROSS_INCOMES_V2() vs. Taxtips.ca (2024 tax year)
 
-**=GET_GROSS_INCOMES_V2(50000, 70, 70, 0, 2024, 0, 5000, 9416, 2000)**
+**=GET_GROSS_INCOMES_V2(50000, 70, 70, 0, 2024, 0, 5000, 9416, 2000, 0)**
 * This example is for a 70 year old in 2024 tax year.
 * We want a net income of **$50,000**
 * We have earned **$5,000** in dividends
 * We have received **$9,416** in old age security payments (OAS)
 * **$2,000** of our total income is from pension credit eligible taxable income.
+* No medical expenses.
 
 Results ==>  **58,824.22**
 
