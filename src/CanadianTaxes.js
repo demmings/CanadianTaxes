@@ -130,7 +130,7 @@ class FederalTaxRates2024 {
          */
         this.charityBrackets = {
             brackets: [0, 200],
-            rates: [.15, .29],
+            rates: [0.15, 0.29],
             base: [0, 30]
         }
     }
