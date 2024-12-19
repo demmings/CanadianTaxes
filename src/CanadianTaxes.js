@@ -82,6 +82,10 @@ function TEST_CANTAX() {
   * @property {Number[]} rates
   * @property {Number[]} base
   */
+
+/**
+ * @classdesc - Federal tax rates for 2024
+ */
 class FederalTaxRates2024 {
     constructor() {
         this.taxYear = 2024;
@@ -139,11 +143,18 @@ class FederalTaxRates2024 {
         return this._nonEligibleDividendGrossUp + 1;
     }
 
+    /**
+     * Object can be queried for tax year supported.
+     * @returns {Number}
+     */
     static year() {
         return 2024;
     }
 }
 
+/**
+ * @classdesc - Federal tax rates for 2025
+ */
 class FederalTaxRates2025 {
     constructor() {
         this.taxYear = 2025;
@@ -185,6 +196,10 @@ class FederalTaxRates2025 {
 
     }
 
+    /**
+     * Object can be queried for tax year supported.
+     * @returns {Number}
+     */
     static year() {
         return 2025;
     }
@@ -205,7 +220,7 @@ class OntarioTaxRates2024 {
 
         this.taxYear = OntarioTaxRates2024.year();
         this.provEligibleDividendTaxCreditRate = 0.10;
-        this.provNonEligibleDividendTaxCreditRate = .029863;
+        this.provNonEligibleDividendTaxCreditRate = 0.029863;
         this.ontBasicPersonAmount = 12399.00;
         this.ageCreditAge = 65;
         this.ontAgeAmount = 6054.00;
@@ -249,11 +264,15 @@ class OntarioTaxRates2024 {
         */
         this.charityBrackets = {
             brackets: [0, 200],
-            rates: [.0505, .1116],
+            rates: [0.0505, 0.1116],
             base: [0, 10.1]
         }
     }
 
+    /**
+     * Object can be queried for tax year supported.
+     * @returns {Number}
+     */
     static year() {
         return 2024;
     }
@@ -267,7 +286,7 @@ class OntarioTaxRates2025 {
 
         this.taxYear = OntarioTaxRates2025.year();  // Change static when copy/pasta to a new year
         this.provEligibleDividendTaxCreditRate = 0.10;
-        this.provNonEligibleDividendTaxCreditRate = .029863;
+        this.provNonEligibleDividendTaxCreditRate = 0.029863;
         this.ontBasicPersonAmount = 12747.00;
         this.ageCreditAge = 65;
         this.ontAgeAmount = 6223.00;
@@ -307,6 +326,10 @@ class OntarioTaxRates2025 {
         };
     }
 
+    /**
+     * Object can be queried for tax year supported.
+     * @returns {Number}
+     */
     static year() {
         return 2025;        //  Update on new tax year
     }
@@ -341,6 +364,10 @@ class FederalTaxes extends FederalTaxRates2024 {
         this.medicalExpenseThreshold = CanadianIncomeCalculator.futureValue(this.medicalExpenseThreshold, 1, inflation, yearsToInflate);
     }
 
+    /**
+     * Loads appropriate tax year data
+     * @param {Number} year 
+     */
     loadYear(year) {
         let obj = FEDERAL_TAX_YEARS[FEDERAL_TAX_YEARS.length - 1];
 
@@ -375,6 +402,10 @@ class OntarioTaxes extends OntarioTaxRates2024 {
         this.medicalExpenseThreshold = CanadianIncomeCalculator.futureValue(this.medicalExpenseThreshold, 1, inflation, yearsToInflate);
     }
 
+    /**
+     * Loads appropriate tax year data
+     * @param {Number} year 
+     */
     loadYear(year) {
         let obj = ONTARIO_TAX_YEARS[ONTARIO_TAX_YEARS.length - 1];
 
