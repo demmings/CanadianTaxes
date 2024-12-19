@@ -127,6 +127,12 @@ Results ==>  **58,824.22**
   * See results of calculation at bottom:
     * Total taxes, clawbacks, CPP/EI premiums ==> **8,824**
 
+## Example Screenshot
+
+# Example Use
+
+![Example](img/exampleCanadianTaxesUse.png)
+
 ### Results Interpretation.
   * RRSP Withdrawal = 58,824 - (9416 + 2000) =  **$47,408**  
     * If there is other taxable income such as CPP or taxable annuities, those amounts should be deducted from 58,824 to find the actual RSP withdrawal
