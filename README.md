@@ -48,7 +48,7 @@
   * This custom function does an internal check and outputs the results.  Ensure there are enough empty lines below so that the custom function can expand the results.
   * The test data is using 2024 tax bracket data.  The expected results column is calculated manually using the TaxTips.ca website.  https://www.taxtips.ca/calculators/canadian-tax/canadian-tax-calculator.htm
 
-* **=GET_GROSS_INCOMES_V2(income, ageInFuture, currentAge, projectedInflation, taxYear, projectedGains, projectedDividends , yearlyOAS, incomeEligibleForPensionCredit, medicalExpenses)**
+* **=GET_GROSS_INCOMES_V2(income, ageInFuture, currentAge, projectedInflation, taxYear, projectedGains, projectedDividends , yearlyOAS, incomeEligibleForPensionCredit, medicalExpenses, nonEligibleDividends, donations)**
    * Process a column of yearly NET INCOMES and return a column of GROSS INCOMES.
    * The GROSS INCOME is the total income from taxable sources like:  pension, RRSP, RRIF, LIF, CPP, OAS (but sources of income used as parameters to the function ARE NOT included in the total - they are used to find total tax payable)
    * The capital gains and dividends are not include in the gross income. They used to find the total tax payable.
@@ -65,8 +65,24 @@
      * **yearlyOAS** - Old Age Security amount.  Used to determine clawback (which is counted as a tax)
      * **incomeEligibleForPensionCredit** - Pension credit eligible income.  This will add to the tax credits up to a specific amount.
      * **medicalExpenses** - Expected yearly medical expenses
+     * **nonEligibleDividends** - non eligible dividends (for enhanced credits)
+     * **donations** - charitable donations
+
    * **returns**  - GROSS Income from ALL taxable sources EXCLUDING capital gains and dividends, but including RRSP, CPP, OAS, ...(all taxable sources)
      * Basically, we are trying to find how much to withdraw from RRSP so RRSP = gross - (CPP + OAS + other taxable sources)
+     * You can enter a single value rather than a column and the function will expand and inflate those values for each year.  
+       * e.g. You are projecting for 30 years and you enter $4,000 into the medical expenses column.  The function will use 4,000 for the first year and then expand for the following 29 years and inflate (using the inflation value entered).
+        * Applicable to the following columns:
+          * incomes 
+          * ageInFuture (incremented, not inflated)
+          * capitalGains
+          * eligibleDividends 
+          * nonEligibleDividends
+          * OAS 
+          * incomeEligibleForPensionCredit 
+          * medicalExpenses 
+          * charitableDonations 
+
   
  * **GET_NET_INCOMES_V2(yearlyGrossIncome, ageInFuture, currentAge, inflation, taxYear, capitalGains, dividendIncome, OAS, pension, medicalExpenses)**
    * **Parameters** - The sames as GET_GROSS_INCOMES_V2, except the first parameter would contain gross incomes and net incomes are calculated.
@@ -137,8 +153,8 @@ Results ==>  **58,824.22**
    *  Future years tax brackets are estimated only.  **It's tough to make predictions, especially about the future.**
 *  Only does taxes for Ontario Canada.
     *   I have coded the js so it should be fairly easy to extended support for other provinces.
-*  Only 2024 tax brackets currently entered.
-   *  However, even if this data is not updated and you use in a later year (e.g. 2026) - the tax brackets will be adjusted for inflation from 2024 to 2026.  
+*  Only 2024, 2025 tax brackets currently entered.
+   *  However, even if this data is not updated and you use in a later year (e.g. 2030) - the tax brackets will be adjusted for inflation from last known (in this case 2025).  
 *  Only a single year of tax rates are supported - it would be nice to handle this years and next (if known) -  future expansion.
 *  Spousal returns are not calculated.
 *  Many special credits that many affect your total tax bill are not calculated (at this time).
