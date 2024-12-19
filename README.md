@@ -101,6 +101,12 @@
   * F2:F28 - expected OAS for the year
   * G2:G28 - income that qualifies for the pension credit
 
+## Example Screenshot
+
+# Example Use
+
+![Example](img/exampleCanadianTaxesUse.png)
+
 ## Example Case for GET_GROSS_INCOMES_V2() vs. Taxtips.ca (2024 tax year)
 
 **=GET_GROSS_INCOMES_V2(50000, 70, 70, 0, 2024, 0, 5000, 9416, 2000, 0)**
@@ -126,12 +132,6 @@ Results ==>  **58,824.22**
     * Pension income (eligible for pension tax credit for persons 65+, pension splitting) ==> **2,000**
   * See results of calculation at bottom:
     * Total taxes, clawbacks, CPP/EI premiums ==> **8,824**
-
-## Example Screenshot
-
-# Example Use
-
-![Example](img/exampleCanadianTaxesUse.png)
 
 ### Results Interpretation.
   * RRSP Withdrawal = 58,824 - (9416 + 2000) =  **$47,408**  
