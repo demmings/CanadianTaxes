@@ -54,7 +54,7 @@ function TEST_CANTAX() {
     const NON_ELIG_DIV_COL = TestCantaxData[0].indexOf("Dividends (non elibible)");
     const CHARITY_COL = TestCantaxData[0].indexOf("Charitable Donations");
 
-
+    let systemStatus = true;
     for (let i = 1; i < TestCantaxData.length; i++) {
         const testItem = TestCantaxData[i];
 
@@ -69,7 +69,8 @@ function TEST_CANTAX() {
             testItem[PENSION_COL],                                          // Pension credit income 
             testItem[MEDICAL_COL],                                          // Medical expenses
             testItem[NON_ELIG_DIV_COL],                                     // Non eligible dividends
-            testItem[CHARITY_COL]                                           // Charitable donations
+            testItem[CHARITY_COL],                                          // Charitable donations
+            false
         );
         
         const netIncome = GET_NET_INCOMES_V2(testItem[EXPECTED_GROSS_COL],  // Income
@@ -83,7 +84,8 @@ function TEST_CANTAX() {
             testItem[PENSION_COL],                                          // Pension credit income 
             testItem[MEDICAL_COL],                                          // Medical expenses
             testItem[NON_ELIG_DIV_COL],                                     // Non eligible dividends
-            testItem[CHARITY_COL]                                           // Charitable donations
+            testItem[CHARITY_COL],                                          // Charitable donations
+            false
         );
 
         const grossDiff = Math.round(grossIncome[0][0]) - Number(testItem[EXPECTED_GROSS_COL]);
@@ -92,9 +94,20 @@ function TEST_CANTAX() {
         const netDiff = Math.round(netIncome[0][0]) - Number(testItem[NET_INCOME_COL]);
         const netStatus = Math.abs(netDiff) <= 1.0 ? "Pass" : "** FAIL **";
         const calculatedData = [grossIncome[0][0], grossDiff, grossStatus, netIncome[0][0], netDiff, netStatus];
+        Logger.log(calculatedData);
+        systemStatus =  Math.abs(grossDiff) > 1 || Math.abs(netDiff) > 1 ?  false : systemStatus;
         // @ts-ignore
         output.push([...testItem, ...calculatedData]);
     }
+    Logger.log("-----------------------------------");
+    if (systemStatus) {
+        Logger.log("SYSTEM TEST -->  SUCCESS");
+    }
+    else
+    {
+        Logger.log("SYSTEM TEST -->  ***  F A I L E D   ***");
+    }
+    Logger.log("-----------------------------------");
 
     return output;
 }
@@ -585,8 +598,8 @@ function GET_NET_INCOMES_V2(yearlyGrossIncome = 0, ageInFuture = 60, currentAge 
  * @returns {Number}
  * @customfunction
  */
-function GET_INCOMETAX_V2(yearlyGrossIncome = 0, ageInFuture = 60, currentAge = null, inflation = null, taxYear = null, capitalGains = null, dividendIncome = null, OAS = null, pension = null) {
-    const taxData = CanadianIncomeCalculator.validateIncomeSettings(yearlyGrossIncome, ageInFuture, currentAge, taxYear, inflation, capitalGains, dividendIncome, OAS, pension);
+function GET_INCOMETAX_V2(yearlyGrossIncome = 0, ageInFuture = 60, currentAge = null, inflation = null, taxYear = null, capitalGains = null, dividendIncome = null, OAS = null, pension = null, medicalExpenses = null, nonEligibleDividends = null, donations=null,debug = true) {
+    const taxData = CanadianIncomeCalculator.validateIncomeSettings(yearlyGrossIncome, ageInFuture, currentAge, taxYear, inflation, capitalGains, dividendIncome, OAS, pension, medicalExpenses, nonEligibleDividends, donations, debug);
     const taxItem = taxData.getTaxItem(0);
     const taxCalc = new CanadianIncomeTax(taxItem.year, taxItem.inflation);
     const taxes = taxCalc.findTotalTax(taxItem, yearlyGrossIncome);
@@ -610,9 +623,7 @@ class CanadianIncomeCalculator {
             const gross = taxCalculator.getGrossIncome(taxItem);
             CanadianIncomeCalculator.logTaxSummary(taxItem);
 
-            const grossIncome = [];
-            grossIncome.push(gross);
-            data[i] = grossIncome;
+            data.push([gross]);
         }
 
         return data;
@@ -629,8 +640,6 @@ class CanadianIncomeCalculator {
         const netIncomes = [];
 
         for (let i = 0; i < taxData.incomes.length; i++) {
-            Logger.log(`Gross Income=${taxData.incomes[i]}. Capital Gains=${taxData.capitalGains[i]}.`)
-
             const taxItem = taxData.getTaxItem(i);
             const net = taxData.incomes[i] - taxCalculator.findTotalTax(taxItem, taxData.incomes[i]);
             CanadianIncomeCalculator.logTaxSummary(taxItem);
