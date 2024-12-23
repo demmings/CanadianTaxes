@@ -17,7 +17,12 @@
 // }
 
 class Logger {
+    /**
+     * 
+     * @param {String} msg 
+     */
     static log(msg) {
+        // skipcq: JS-0002
         console.log(msg);
     }
 }
