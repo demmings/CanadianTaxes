@@ -115,6 +115,110 @@ function TEST_CANTAX() {
     return output;
 }
 
+/**
+ * Process a column of yearly NET INCOMES and return a column of GROSS INCOMES.
+ * The GROSS INCOME is the total income from taxable sources like:  pension, RRSP, RRIF, LIF, CPP, OAS.
+ * The capital gains and dividends are not include in the gross income. They used
+ * to find the total tax payable.
+ * The 'currentAge' uses the CURRENT TAX RATES, but future years the tax brackets are
+ * adjusted by inflation.  The assumption is that if the net income stayed the same
+ * over time, the gross income required to process that net amount will DROP.
+ * @param {any} income - array of net income
+ * @param {any} ageInFuture - array of retireee age for given net income. 
+ * @param {Number} currentAge - present day age of retiree
+ * @param {Number} projectedInflation - long term projected inflation rate - used to adjust TAX BRACKETS only.
+ * We use the TAX RATES for the starting year, but can only guess the tax rates of future years.  The basic
+ * personal exeption and tax brackets are adjusted by this inflation amount.
+ * @param {Number} taxYear - tax year of present day retireee.  Used to adjust tax brackets.
+ * @param {any} projectedGains - amount of assets sold each year subject to capital gains tax
+ * @param {any} projectedDividends - amount of dividends received each year
+ * @param {any} yearlyOAS - Old Age Security amount.  Used to determine clawback (which is counted as a tax)
+ * @param {any} incomeEligibleForPensionCredit - income that qualifies as pension credit eligible income
+ * @param {any} medicalExpenses
+ * @param {any} nonEligibleDividends
+ * @param {any} donations
+ * @param {Boolean} debug -  extra Logger output
+ * @returns {Number[][]} - GROSS Income from ALL taxable sources EXCLUDING capital gains and dividends, but including RRSP, CPP, OAS, ...(all taxable sources)
+ * Basically, we are trying to find how much to withdraw from RRSP so RRSP = gross - (CPP + OAS + other taxable sources)
+ * @customfunction
+ */
+function GET_GROSS_INCOMES_V2(income = 0, ageInFuture = 60, currentAge = null, projectedInflation = null, taxYear = null, projectedGains = null, projectedDividends = null, yearlyOAS = null, incomeEligibleForPensionCredit = null, medicalExpenses = null, nonEligibleDividends = null, donations = null, debug = true) {
+    if (debug) Logger.log("GET_GROSS_INCOMES");
+
+    const taxData = CanadianIncomeCalculator.validateIncomeSettings(income,
+        ageInFuture,
+        currentAge,
+        taxYear,
+        projectedInflation,
+        projectedGains,
+        projectedDividends,
+        yearlyOAS,
+        incomeEligibleForPensionCredit,
+        medicalExpenses,
+        nonEligibleDividends,
+        donations,
+        debug);
+
+    return CanadianIncomeCalculator.getGrossIncomes(taxData);
+}
+
+/**
+ * 
+ * @param {any} yearlyGrossIncome 
+ * @param {any} ageInFuture 
+ * @param {Number} currentAge
+ * @param {Number} inflation
+ * @param {Number} taxYear
+ * @param {any} capitalGains
+ * @param {any} dividendIncome
+ * @param {any} pension
+ * @param {any} medicalExpenses
+ * @param {any} nonEligibleDividends
+ * @param {any} debug
+ * @returns {Number[][]}
+ * @customfunction
+ */
+function GET_NET_INCOMES_V2(yearlyGrossIncome = 0, ageInFuture = 60, currentAge = null, inflation = null, taxYear = null, capitalGains = null, dividendIncome = null, OAS = null, pension = null, medicalExpenses = null, nonEligibleDividends = null, donations = null, debug = true) {
+    const taxData = CanadianIncomeCalculator.validateIncomeSettings(yearlyGrossIncome,
+        ageInFuture,
+        currentAge,
+        taxYear,
+        inflation,
+        capitalGains,
+        dividendIncome,
+        OAS,
+        pension,
+        medicalExpenses,
+        nonEligibleDividends,
+        donations,
+        debug);
+
+    return CanadianIncomeCalculator.getNetIncomes(taxData);
+}
+
+/**
+ * 
+ * @param {any} yearlyGrossIncome 
+ * @param {any} ageInFuture 
+ * @param {Number} currentAge
+ * @param {Number} inflation
+ * @param {Number} taxYear
+ * @param {any} capitalGains
+ * @param {any} dividendIncome
+ * @param {any} pension
+ * @returns {Number}
+ * @customfunction
+ */
+function GET_INCOMETAX_V2(yearlyGrossIncome = 0, ageInFuture = 60, currentAge = null, inflation = null, taxYear = null, capitalGains = null, dividendIncome = null, OAS = null, pension = null, medicalExpenses = null, nonEligibleDividends = null, donations = null, debug = true) {
+    const taxData = CanadianIncomeCalculator.validateIncomeSettings(yearlyGrossIncome, ageInFuture, currentAge, taxYear, inflation, capitalGains, dividendIncome, OAS, pension, medicalExpenses, nonEligibleDividends, donations, debug);
+    const taxItem = taxData.getTaxItem(0);
+    const taxCalc = new CanadianIncomeTax(taxItem.year, taxItem.inflation);
+    const taxes = taxCalc.findTotalTax(taxItem, yearlyGrossIncome);
+    CanadianIncomeCalculator.logTaxSummary(taxItem);
+
+    return taxes;
+}
+
 /** @typedef BracketObject
   * @property {Number[]} brackets
   * @property {Number[]} rates
@@ -511,109 +615,7 @@ class OntarioTaxes extends OntarioTaxRates2024 {
  * @property {function} getTaxItem
  */
 
-/**
- * Process a column of yearly NET INCOMES and return a column of GROSS INCOMES.
- * The GROSS INCOME is the total income from taxable sources like:  pension, RRSP, RRIF, LIF, CPP, OAS.
- * The capital gains and dividends are not include in the gross income. They used
- * to find the total tax payable.
- * The 'currentAge' uses the CURRENT TAX RATES, but future years the tax brackets are
- * adjusted by inflation.  The assumption is that if the net income stayed the same
- * over time, the gross income required to process that net amount will DROP.
- * @param {any} income - array of net income
- * @param {any} ageInFuture - array of retireee age for given net income. 
- * @param {Number} currentAge - present day age of retiree
- * @param {Number} projectedInflation - long term projected inflation rate - used to adjust TAX BRACKETS only.
- * We use the TAX RATES for the starting year, but can only guess the tax rates of future years.  The basic
- * personal exeption and tax brackets are adjusted by this inflation amount.
- * @param {Number} taxYear - tax year of present day retireee.  Used to adjust tax brackets.
- * @param {any} projectedGains - amount of assets sold each year subject to capital gains tax
- * @param {any} projectedDividends - amount of dividends received each year
- * @param {any} yearlyOAS - Old Age Security amount.  Used to determine clawback (which is counted as a tax)
- * @param {any} incomeEligibleForPensionCredit - income that qualifies as pension credit eligible income
- * @param {any} medicalExpenses
- * @param {any} nonEligibleDividends
- * @param {any} donations
- * @param {Boolean} debug -  extra Logger output
- * @returns {Number[][]} - GROSS Income from ALL taxable sources EXCLUDING capital gains and dividends, but including RRSP, CPP, OAS, ...(all taxable sources)
- * Basically, we are trying to find how much to withdraw from RRSP so RRSP = gross - (CPP + OAS + other taxable sources)
- * @customfunction
- */
-function GET_GROSS_INCOMES_V2(income = 0, ageInFuture = 60, currentAge = null, projectedInflation = null, taxYear = null, projectedGains = null, projectedDividends = null, yearlyOAS = null, incomeEligibleForPensionCredit = null, medicalExpenses = null, nonEligibleDividends = null, donations = null, debug = true) {
-    if (debug) Logger.log("GET_GROSS_INCOMES");
 
-    const taxData = CanadianIncomeCalculator.validateIncomeSettings(income,
-        ageInFuture,
-        currentAge,
-        taxYear,
-        projectedInflation,
-        projectedGains,
-        projectedDividends,
-        yearlyOAS,
-        incomeEligibleForPensionCredit,
-        medicalExpenses,
-        nonEligibleDividends,
-        donations,
-        debug);
-
-    return CanadianIncomeCalculator.getGrossIncomes(taxData);
-}
-
-/**
- * 
- * @param {any} yearlyGrossIncome 
- * @param {any} ageInFuture 
- * @param {Number} currentAge
- * @param {Number} inflation
- * @param {Number} taxYear
- * @param {any} capitalGains
- * @param {any} dividendIncome
- * @param {any} pension
- * @param {any} medicalExpenses
- * @param {any} nonEligibleDividends
- * @param {any} debug
- * @returns {Number[][]}
- * @customfunction
- */
-function GET_NET_INCOMES_V2(yearlyGrossIncome = 0, ageInFuture = 60, currentAge = null, inflation = null, taxYear = null, capitalGains = null, dividendIncome = null, OAS = null, pension = null, medicalExpenses = null, nonEligibleDividends = null, donations = null, debug = true) {
-    const taxData = CanadianIncomeCalculator.validateIncomeSettings(yearlyGrossIncome,
-        ageInFuture,
-        currentAge,
-        taxYear,
-        inflation,
-        capitalGains,
-        dividendIncome,
-        OAS,
-        pension,
-        medicalExpenses,
-        nonEligibleDividends,
-        donations,
-        debug);
-
-    return CanadianIncomeCalculator.getNetIncomes(taxData);
-}
-
-/**
- * 
- * @param {any} yearlyGrossIncome 
- * @param {any} ageInFuture 
- * @param {Number} currentAge
- * @param {Number} inflation
- * @param {Number} taxYear
- * @param {any} capitalGains
- * @param {any} dividendIncome
- * @param {any} pension
- * @returns {Number}
- * @customfunction
- */
-function GET_INCOMETAX_V2(yearlyGrossIncome = 0, ageInFuture = 60, currentAge = null, inflation = null, taxYear = null, capitalGains = null, dividendIncome = null, OAS = null, pension = null, medicalExpenses = null, nonEligibleDividends = null, donations = null, debug = true) {
-    const taxData = CanadianIncomeCalculator.validateIncomeSettings(yearlyGrossIncome, ageInFuture, currentAge, taxYear, inflation, capitalGains, dividendIncome, OAS, pension, medicalExpenses, nonEligibleDividends, donations, debug);
-    const taxItem = taxData.getTaxItem(0);
-    const taxCalc = new CanadianIncomeTax(taxItem.year, taxItem.inflation);
-    const taxes = taxCalc.findTotalTax(taxItem, yearlyGrossIncome);
-    CanadianIncomeCalculator.logTaxSummary(taxItem);
-
-    return taxes;
-}
 
 class CanadianIncomeCalculator {
     /**
