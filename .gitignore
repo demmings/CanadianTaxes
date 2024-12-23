@@ -3,3 +3,4 @@ appsscript.json
 .clasp.json
 .claspignore
 .gitignore
+**/src/coverage/**

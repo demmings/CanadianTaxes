@@ -1,20 +1,20 @@
-/*  *** DEBUG START ***
+//  *** DEBUG START ***
 //  Remove comments for testing in NODE
 
-function getGross() {
-    const val = GET_GROSS_INCOMES_V2(80000, 70, 70, 0, 2027, 2000, 50000, 9416, 2000, 4000);
-    Logger.log("Gross=" + val);
-}
+// function getGross() {
+//     const val = GET_GROSS_INCOMES_V2(80000, 70, 70, 2, 2030, 2000, 50000, 9416, 2000, 4000);
+//     Logger.log("Gross=" + val);
+// }
 
-function getTax() {
-    const val = GET_INCOMETAX_V2(126016, 68, 13000);
-    Logger.log(126016 - val);
-}
+// function getTax() {
+//     const val = GET_INCOMETAX_V2(126016, 68, 13000);
+//     Logger.log(126016 - val);
+// }
 
-function getNet() {
-    const val = GET_NET_INCOMES_V2(0, 62, 62, 0, null, 50000, 0, 0, 0);
-    Logger.log("Net=" + val);
-}
+// function getNet() {
+//     const val = GET_NET_INCOMES_V2(0, 62, 62, 0, null, 50000, 0, 0, 0);
+//     Logger.log("Net=" + val);
+// }
 
 class Logger {
     static log(msg) {
@@ -31,41 +31,43 @@ class Logger {
  */
 function TEST_CANTAX() {
     const TestCantaxData = [
-        ["Tax Year","Age","Net Income","Expected Gross Taxable Income","Dividends Eligible for Enhanced Tax Credit","Dividends (non elibible)","Eligible Capital Gains","OAS","Pension Credit Eligible Income","Medical Expenses","Charitable Donations"],
-        [2024,59,180000.00,300244.00,5000.00,0.00,0.00,0.00,0.00,0.00,0.00],
-        [2024,60,57000.00,70272.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00],
-        [2024,61,58000.00,72833.00,10200.00,0.00,0.00,0.00,0.00,0.00,0.00],
-        [2024,62,59000.00,74277.00,10450.00,0.00,0.00,0.00,0.00,0.00,0.00],
-        [2024,63,60000.00,75712.00,10600.00,0.00,0.00,0.00,0.00,0.00,0.00],
-        [2024,64,61000.00,77191.00,10800.00,0.00,0.00,0.00,0.00,0.00,0.00],
-        [2024,65,62000.00,78368.00,11000.00,0.00,0.00,0.00,0.00,0.00,0.00],
-        [2024,66,70000.00,90663.00,12000.00,0.00,0.00,0.00,0.00,0.00,0.00],
-        [2024,67,80000.00,108254.00,12800.00,0.00,0.00,0.00,0.00,0.00,0.00],
-        [2024,68,90000.00,126016.00,13000.00,0.00,0.00,0.00,0.00,0.00,0.00],
-        [2024,69,90000.00,120185.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00],
-        [2024,70,120000.00,173897.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00],
-        [2024,70,120000.00,178565.00,0.00,0.00,10000.00,0.00,0.00,0.00,0.00],
-        [2024,70,120000.00,224492.00,0.00,0.00,100000.00,0.00,0.00,0.00,0.00],
-        [2024,70,120000.00,502868.00,0.00,0.00,500000.00,0.00,0.00,0.00,0.00],
-        [2024,70,120000.00,511335.00,10000.00,0.00,500000.00,0.00,0.00,0.00,0.00],
-        [2024,70,120000.00,319350.00,10000.00,0.00,249999.00,0.00,0.00,0.00,0.00],
-        [2024,70,50000.00,71924.00,50000.00,0.00,0.00,0.00,0.00,0.00,0.00],
-        [2024,70,10000.00,10796.00,50000.00,0.00,0.00,0.00,0.00,0.00,0.00],
-        [2024,70,0.00,600.00,50000.00,0.00,0.00,0.00,0.00,0.00,0.00],
-        [2024,70,180000.00,309659.00,5000.00,0.00,0.00,9416.00,0.00,0.00,0.00],
-        [2024,70,80000.00,108410.00,5000.00,0.00,0.00,9416.00,0.00,0.00,0.00],
-        [2024,70,50000.00,59398.00,5000.00,0.00,0.00,9416.00,0.00,0.00,0.00],
-        [2024,70,50000.00,58824.00,5000.00,0.00,0.00,9416.00,2000.00,0.00,0.00],
-        [2024,70,50000.00,59309.00,5000.00,0.00,2000.00,9416.00,2000.00,0.00,0.00],
-        [2024,70,50000.00,58713.00,5000.00,0.00,2000.00,9416.00,2000.00,4000.00,0.00],
-        [2025,62,50000.00,59766.00,5000.00,0.00,2000.00,0.00,2000.00,4000.00,0.00],
-        [2025,70,50000.00,58254.00,5000.00,0.00,2000.00,9416.00,2000.00,4000.00,0.00],
-        [2025,69,80000.00,135075.00,50000.00,0.00,2000.00,9416.00,2000.00,4000.00,0.00],
-        [2025,69,80000.00,151965.00,50000.00,20000.00,2000.00,9416.00,2000.00,4000.00,0.00],
-        [2025,69,80000.00,151133.00,50000.00,20000.00,2000.00,9416.00,2000.00,4000.00,1000.00]
+        ["Tax Year", "Age", "Net Income", "Expected Gross Taxable Income", "Dividends Eligible for Enhanced Tax Credit", "Dividends (non elibible)", "Eligible Capital Gains", "OAS", "Pension Credit Eligible Income", "Medical Expenses", "Charitable Donations", "Inflation"],
+        [2024, 59, 180000.00, 300244.00, 5000.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 60, 57000.00, 70272.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 61, 58000.00, 72833.00, 10200.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 62, 59000.00, 74277.00, 10450.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 63, 60000.00, 75712.00, 10600.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 64, 61000.00, 77191.00, 10800.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 65, 62000.00, 78368.00, 11000.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 66, 70000.00, 90663.00, 12000.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 67, 80000.00, 108254.00, 12800.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 68, 90000.00, 126016.00, 13000.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 69, 90000.00, 120185.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 70, 120000.00, 173897.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 70, 120000.00, 178565.00, 0.00, 0.00, 10000.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 70, 120000.00, 224492.00, 0.00, 0.00, 100000.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 70, 120000.00, 502868.00, 0.00, 0.00, 500000.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 70, 120000.00, 511335.00, 10000.00, 0.00, 500000.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 70, 120000.00, 319350.00, 10000.00, 0.00, 249999.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 70, 50000.00, 71924.00, 50000.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 70, 10000.00, 10796.00, 50000.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 70, 0.00, 600.00, 50000.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 70, 180000.00, 309659.00, 5000.00, 0.00, 0.00, 9416.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 70, 80000.00, 108410.00, 5000.00, 0.00, 0.00, 9416.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 70, 50000.00, 59398.00, 5000.00, 0.00, 0.00, 9416.00, 0.00, 0.00, 0.00, 0.00],
+        [2024, 70, 50000.00, 58824.00, 5000.00, 0.00, 0.00, 9416.00, 2000.00, 0.00, 0.00, 0.00],
+        [2024, 70, 50000.00, 59309.00, 5000.00, 0.00, 2000.00, 9416.00, 2000.00, 0.00, 0.00, 0.00],
+        [2024, 70, 50000.00, 58713.00, 5000.00, 0.00, 2000.00, 9416.00, 2000.00, 4000.00, 0.00, 0.00],
+        [2025, 62, 50000.00, 59766.00, 5000.00, 0.00, 2000.00, 0.00, 2000.00, 4000.00, 0.00, 0.00],
+        [2025, 70, 50000.00, 58254.00, 5000.00, 0.00, 2000.00, 9416.00, 2000.00, 4000.00, 0.00, 0.00],
+        [2025, 69, 80000.00, 135075.00, 50000.00, 0.00, 2000.00, 9416.00, 2000.00, 4000.00, 0.00, 0.00],
+        [2025, 69, 80000.00, 151965.00, 50000.00, 20000.00, 2000.00, 9416.00, 2000.00, 4000.00, 0.00, 0.00],
+        [2025, 69, 80000.00, 151133.00, 50000.00, 20000.00, 2000.00, 9416.00, 2000.00, 4000.00, 1000.00, 0.00],
+        [2030, 69, 80000.00, 151133.00, 50000.00, 20000.00, 2000.00, 9416.00, 2000.00, 4000.00, 1000.00, 0.00],
+        [2030, 69, 80000.00, 144461.00, 50000.00, 20000.00, 2000.00, 9416.00, 2000.00, 4000.00, 1000.00, 2.00]
     ];
 
-    const calcColums = [ "Gross Income (calculated)", "Gross Diff", "Pass/Fail", "Net Income (calculated)",  "Net Diff", "Pass/Fail"];
+    const calcColums = ["Gross Income (calculated)", "Gross Diff", "Pass/Fail", "Net Income (calculated)", "Net Diff", "Pass/Fail"];
     const output = [[...TestCantaxData[0], ...calcColums]];
     const EXPECTED_GROSS_COL = TestCantaxData[0].indexOf("Expected Gross Taxable Income");
     const FUTURE_AGE_COL = TestCantaxData[0].indexOf("Age");
@@ -78,15 +80,17 @@ function TEST_CANTAX() {
     const MEDICAL_COL = TestCantaxData[0].indexOf("Medical Expenses");
     const NON_ELIG_DIV_COL = TestCantaxData[0].indexOf("Dividends (non elibible)");
     const CHARITY_COL = TestCantaxData[0].indexOf("Charitable Donations");
+    const INFLATION_COL = TestCantaxData[0].indexOf("Inflation");
 
     let systemStatus = true;
     for (let i = 1; i < TestCantaxData.length; i++) {
         const testItem = TestCantaxData[i];
+        const showDebug = i === 1;
 
         const grossIncome = GET_GROSS_INCOMES_V2(testItem[NET_INCOME_COL],  // Income
             testItem[FUTURE_AGE_COL],                                       // Future age
             Number(testItem[FUTURE_AGE_COL]),                               // Current age
-            0,                                                              // Inflation
+            Number(testItem[INFLATION_COL]),                                                              // Inflation
             Number(testItem[YEAR_COL]),                                     // Tax year
             testItem[GAINS_COL],                                            // Capital gains
             testItem[ELIG_DIV_COL],                                         // Eligible Dividends
@@ -95,13 +99,13 @@ function TEST_CANTAX() {
             testItem[MEDICAL_COL],                                          // Medical expenses
             testItem[NON_ELIG_DIV_COL],                                     // Non eligible dividends
             testItem[CHARITY_COL],                                          // Charitable donations
-            false
+            showDebug
         );
-        
+
         const netIncome = GET_NET_INCOMES_V2(testItem[EXPECTED_GROSS_COL],  // Income
             testItem[FUTURE_AGE_COL],                                       // Future age
             Number(testItem[FUTURE_AGE_COL]),                               // Current age
-            0,                                                              // Inflation
+            Number(testItem[INFLATION_COL]),                                                              // Inflation
             Number(testItem[YEAR_COL]),                                     // Tax year
             testItem[GAINS_COL],                                            // Capital gains
             testItem[ELIG_DIV_COL],                                         // Eligible Dividends
@@ -110,17 +114,17 @@ function TEST_CANTAX() {
             testItem[MEDICAL_COL],                                          // Medical expenses
             testItem[NON_ELIG_DIV_COL],                                     // Non eligible dividends
             testItem[CHARITY_COL],                                          // Charitable donations
-            false
+            showDebug
         );
 
         const grossDiff = Math.round(grossIncome[0][0]) - Number(testItem[EXPECTED_GROSS_COL]);
         const grossStatus = Math.abs(grossDiff) <= 1.0 ? "Pass" : "** FAIL **";
-         
+
         const netDiff = Math.round(netIncome[0][0]) - Number(testItem[NET_INCOME_COL]);
         const netStatus = Math.abs(netDiff) <= 1.0 ? "Pass" : "** FAIL **";
         const calculatedData = [grossIncome[0][0], grossDiff, grossStatus, netIncome[0][0], netDiff, netStatus];
         Logger.log(calculatedData);
-        systemStatus =  Math.abs(grossDiff) > 1 || Math.abs(netDiff) > 1 ?  false : systemStatus;
+        systemStatus = Math.abs(grossDiff) > 1 || Math.abs(netDiff) > 1 ? false : systemStatus;
         // @ts-ignore
         output.push([...testItem, ...calculatedData]);
     }
@@ -128,8 +132,7 @@ function TEST_CANTAX() {
     if (systemStatus) {
         Logger.log("SYSTEM TEST -->  SUCCESS");
     }
-    else
-    {
+    else {
         Logger.log("SYSTEM TEST -->  ***  F A I L E D   ***");
     }
     Logger.log("-----------------------------------");
@@ -144,11 +147,12 @@ function TEST_CANTAX() {
   */
 
 /**
- * @classdesc - Federal tax rates for 2024
+ * @classdesc - Federal tax rates for 2024.  Add any required functions to this base class.
+ * NOTE:  Add each tax year object in order to the constant FEDERAL_TAX_YEARS to FederalTaxes{} class.
  */
 class FederalTaxRates2024 {
     constructor() {
-        this.taxYear = 2024;
+        this.taxYear = FederalTaxRates2024.year();
         this._dividendGrossUp = 0.38;
         this.eligibleDividendTaxCreditRate = 0.150198;
         this._nonEligibleDividendGrossUp = 0.15;
@@ -182,6 +186,8 @@ class FederalTaxRates2024 {
         this.taxBracketInfo = {
             brackets: [0, 55867, 111733, 173205, 246752],
             rates: [0.15, 0.205, 0.26, 0.29, 0.33],
+            //  BASE[i] = BASE[i-1] + RATE[i-1] * (BRACKET[i]- BRACKET[i-1])
+            //  eg:   BASE[2] = 8380.05 + .205 * (111733-55867) =  
             base: [0, 8380.05, 19832.58, 35815.30, 57143.93]
         };
 
@@ -217,7 +223,7 @@ class FederalTaxRates2024 {
  */
 class FederalTaxRates2025 {
     constructor() {
-        this.taxYear = 2025;
+        this.taxYear = FederalTaxRates2025.year();
         this._dividendGrossUp = 0.38;
         this.eligibleDividendTaxCreditRate = 0.150198;
         this._nonEligibleDividendGrossUp = 0.15;
@@ -265,15 +271,9 @@ class FederalTaxRates2025 {
     }
 }
 
-const FEDERAL_TAX_YEARS =
-    [
-        FederalTaxRates2024,
-        FederalTaxRates2025
-    ];
-
-
 /**
  * @classdesc - All relevant Ontario tax rates for indicated tax year.
+ * Add each new year of tax rates to ONTARIO_TAX_YEARS below
  */
 class OntarioTaxRates2024 {
     constructor() {
@@ -395,12 +395,6 @@ class OntarioTaxRates2025 {
     }
 }
 
-const ONTARIO_TAX_YEARS =
-    [
-        OntarioTaxRates2024,
-        OntarioTaxRates2025
-    ];
-
 class FederalTaxes extends FederalTaxRates2024 {
     //  Basic personal amounts, tax brackets adjusted for inflation in future years.
     constructor(taxYear, inflation) {
@@ -414,14 +408,14 @@ class FederalTaxes extends FederalTaxRates2024 {
         }
 
         this.taxYear = taxYear;
-        this.basicPersonAmount = CanadianIncomeCalculator.futureValue(this.basicPersonAmount, 1, inflation, yearsToInflate);
-        this.additionalBasicPersonalAmount = CanadianIncomeCalculator.futureValue(this.additionalBasicPersonalAmount, 1, inflation, yearsToInflate);
-        this.additionalBpaThreshold = CanadianIncomeCalculator.futureValue(this.additionalBpaThreshold, 1, inflation, yearsToInflate);
-        this.ageAmount = CanadianIncomeCalculator.futureValue(this.ageAmount, 1, inflation, yearsToInflate);
-        this.ageThreshold = CanadianIncomeCalculator.futureValue(this.ageThreshold, 1, inflation, yearsToInflate);
-        this.OASclawbackThreshold = CanadianIncomeCalculator.futureValue(this.OASclawbackThreshold, 1, inflation, yearsToInflate);
-        this.taxBracketInfo = CanadianIncomeCalculator.inflateBracket(this.taxBracketInfo, yearsToInflate, inflation);
-        this.medicalExpenseThreshold = CanadianIncomeCalculator.futureValue(this.medicalExpenseThreshold, 1, inflation, yearsToInflate);
+        this.basicPersonAmount = CanadianTaxUtils.futureValue(this.basicPersonAmount, 1, inflation, yearsToInflate);
+        this.additionalBasicPersonalAmount = CanadianTaxUtils.futureValue(this.additionalBasicPersonalAmount, 1, inflation, yearsToInflate);
+        this.additionalBpaThreshold = CanadianTaxUtils.futureValue(this.additionalBpaThreshold, 1, inflation, yearsToInflate);
+        this.ageAmount = CanadianTaxUtils.futureValue(this.ageAmount, 1, inflation, yearsToInflate);
+        this.ageThreshold = CanadianTaxUtils.futureValue(this.ageThreshold, 1, inflation, yearsToInflate);
+        this.OASclawbackThreshold = CanadianTaxUtils.futureValue(this.OASclawbackThreshold, 1, inflation, yearsToInflate);
+        this.taxBracketInfo = CanadianTaxUtils.inflateBracket(this.taxBracketInfo, yearsToInflate, inflation);
+        this.medicalExpenseThreshold = CanadianTaxUtils.futureValue(this.medicalExpenseThreshold, 1, inflation, yearsToInflate);
     }
 
     /**
@@ -429,8 +423,14 @@ class FederalTaxes extends FederalTaxRates2024 {
      * @param {Number} year 
      */
     loadYear(year) {
-        let obj = FEDERAL_TAX_YEARS[FEDERAL_TAX_YEARS.length - 1];
+        //  Add each year of tax rates.
+        const FEDERAL_TAX_YEARS =
+            [
+                FederalTaxRates2024,
+                FederalTaxRates2025
+            ];
 
+        let obj = FEDERAL_TAX_YEARS[FEDERAL_TAX_YEARS.length - 1];
         for (const fedTaxObject of FEDERAL_TAX_YEARS) {
             if (year <= fedTaxObject.year()) {
                 obj = fedTaxObject;
@@ -453,13 +453,14 @@ class OntarioTaxes extends OntarioTaxRates2024 {
             return;
         }
 
-        this.ontBasicPersonAmount = CanadianIncomeCalculator.futureValue(this.ontBasicPersonAmount, 1, inflation, yearsToInflate);
-        this.ontAgeAmount = CanadianIncomeCalculator.futureValue(this.ontAgeAmount, 1, inflation, yearsToInflate);
-        this.ontAgeThreshold = CanadianIncomeCalculator.futureValue(this.ontAgeThreshold, 1, inflation, yearsToInflate);
-        this.OASclawbackThreshold = CanadianIncomeCalculator.futureValue(this.OASclawbackThreshold, 1, inflation, yearsToInflate);
-        this.ontTaxBracketInfo = CanadianIncomeCalculator.inflateBracket(this.ontTaxBracketInfo, yearsToInflate, inflation);
-        this.ontSurtaxBracketInfo = CanadianIncomeCalculator.inflateBracket(this.ontSurtaxBracketInfo, yearsToInflate, inflation);
-        this.medicalExpenseThreshold = CanadianIncomeCalculator.futureValue(this.medicalExpenseThreshold, 1, inflation, yearsToInflate);
+        this.taxYear = taxYear;
+        this.ontBasicPersonAmount = CanadianTaxUtils.futureValue(this.ontBasicPersonAmount, 1, inflation, yearsToInflate);
+        this.ontAgeAmount = CanadianTaxUtils.futureValue(this.ontAgeAmount, 1, inflation, yearsToInflate);
+        this.ontAgeThreshold = CanadianTaxUtils.futureValue(this.ontAgeThreshold, 1, inflation, yearsToInflate);
+        this.OASclawbackThreshold = CanadianTaxUtils.futureValue(this.OASclawbackThreshold, 1, inflation, yearsToInflate);
+        this.ontTaxBracketInfo = CanadianTaxUtils.inflateBracket(this.ontTaxBracketInfo, yearsToInflate, inflation);
+        this.ontSurtaxBracketInfo = CanadianTaxUtils.inflateBracket(this.ontSurtaxBracketInfo, yearsToInflate, inflation);
+        this.medicalExpenseThreshold = CanadianTaxUtils.futureValue(this.medicalExpenseThreshold, 1, inflation, yearsToInflate);
     }
 
     /**
@@ -467,6 +468,12 @@ class OntarioTaxes extends OntarioTaxRates2024 {
      * @param {Number} year 
      */
     loadYear(year) {
+        const ONTARIO_TAX_YEARS =
+            [
+                OntarioTaxRates2024,
+                OntarioTaxRates2025
+            ];
+
         let obj = ONTARIO_TAX_YEARS[ONTARIO_TAX_YEARS.length - 1];
 
         for (const fedTaxObject of ONTARIO_TAX_YEARS) {
@@ -592,7 +599,7 @@ function GET_GROSS_INCOMES_V2(income = 0, ageInFuture = 60, currentAge = null, p
  * @returns {Number[][]}
  * @customfunction
  */
-function GET_NET_INCOMES_V2(yearlyGrossIncome = 0, ageInFuture = 60, currentAge = null, inflation = null, taxYear = null, capitalGains = null, dividendIncome = null, OAS = null, pension = null, medicalExpenses = null, nonEligibleDividends = null, donations=null,debug = true) {
+function GET_NET_INCOMES_V2(yearlyGrossIncome = 0, ageInFuture = 60, currentAge = null, inflation = null, taxYear = null, capitalGains = null, dividendIncome = null, OAS = null, pension = null, medicalExpenses = null, nonEligibleDividends = null, donations = null, debug = true) {
     const taxData = CanadianIncomeCalculator.validateIncomeSettings(yearlyGrossIncome,
         ageInFuture,
         currentAge,
@@ -623,7 +630,7 @@ function GET_NET_INCOMES_V2(yearlyGrossIncome = 0, ageInFuture = 60, currentAge 
  * @returns {Number}
  * @customfunction
  */
-function GET_INCOMETAX_V2(yearlyGrossIncome = 0, ageInFuture = 60, currentAge = null, inflation = null, taxYear = null, capitalGains = null, dividendIncome = null, OAS = null, pension = null, medicalExpenses = null, nonEligibleDividends = null, donations=null,debug = true) {
+function GET_INCOMETAX_V2(yearlyGrossIncome = 0, ageInFuture = 60, currentAge = null, inflation = null, taxYear = null, capitalGains = null, dividendIncome = null, OAS = null, pension = null, medicalExpenses = null, nonEligibleDividends = null, donations = null, debug = true) {
     const taxData = CanadianIncomeCalculator.validateIncomeSettings(yearlyGrossIncome, ageInFuture, currentAge, taxYear, inflation, capitalGains, dividendIncome, OAS, pension, medicalExpenses, nonEligibleDividends, donations, debug);
     const taxItem = taxData.getTaxItem(0);
     const taxCalc = new CanadianIncomeTax(taxItem.year, taxItem.inflation);
@@ -705,7 +712,8 @@ class CanadianIncomeCalculator {
         const incomeEligibleForPensionCredit = CanadianIncomeCalculator.prepTaxInput(items, inflation, pensionIncome);
         const medicalExpenses = CanadianIncomeCalculator.prepTaxInput(items, inflation, medicalCosts);
         const charitableDonations = CanadianIncomeCalculator.prepTaxInput(items, inflation, donations);
-        const currentAge = age === null ? (Array.isArray(ageInFuture) ? ageInFuture[0] : ageInFuture) : Number(age);
+        const guessOfCurrentAge = Array.isArray(ageInFuture) ? ageInFuture[0] : ageInFuture;
+        const currentAge = age === null ? guessOfCurrentAge : Number(age);
         const year = taxYear === null || taxYear === '' || typeof taxYear === 'undefined' ? new Date().getFullYear() : Number(taxYear);
 
         const taxData = { incomes, ageInFuture, currentAge, year, inflation, capitalGains, eligibleDividends, OAS, incomeEligibleForPensionCredit, medicalExpenses, nonEligibleDividends, charitableDonations, debug };
@@ -749,7 +757,7 @@ class CanadianIncomeCalculator {
     static prepTaxInput(items, inflation, val) {
         let taxProperty = [];
         if (Array.isArray(val)) {
-            taxProperty = CanadianIncomeCalculator.convertRowsToSingleArray(val).map(inc => Number(inc));
+            taxProperty = CanadianTaxUtils.convertRowsToSingleArray(val).map(inc => Number(inc));
         }
         else {
             let startVal = val === null ? 0 : Number(val);
@@ -762,67 +770,6 @@ class CanadianIncomeCalculator {
         }
 
         return taxProperty;
-    }
-
-    /**
-     * When you request a single column of data from getRange(), it is still a double array.
-     * Convert to single array for reguar array processing.
-     * @param {any[][]} doubleArray 
-     * @param {Number} columnNumber 
-     * @returns {any[]}
-     */
-    static convertRowsToSingleArray(doubleArray, columnNumber = 0) {
-        if (!Array.isArray(doubleArray)) {
-            return doubleArray;
-        }
-
-        return doubleArray.map(item => item[columnNumber]);
-    }
-
-    /***********************************************
-      *              Present Value                  *
-      * pv = fv / (1 + (rate / freq))^periods       *
-      * pv = Present Value                          *
-      * fv = Future Value                           *
-      * rate = interest rate (expressed as %)       *
-      * freq = compounding frequency                *
-      * periods = number of periods until maturity  *
-      ***********************************************/
-    static presentValue(fv, freq, rate, periods) {
-        return (fv / Math.pow((1 + (rate / 100 / freq)), periods));
-    }
-
-    /************************************************
-     *                Future Value                  *
-     * fv = pv * (1 + (rate / freq))^periods        *
-     * fv = Future Value                            *
-     * pv = Present Value                           *
-     * rate = interest rate (expressed as %)        *
-     * freq = compounding frequency                 *
-     * periods = number of periods until maturity   *
-     ************************************************/
-    static futureValue(pv, freq, rate, periods) {
-        return (pv * Math.pow(1 + (rate / 100 / freq), periods));
-    }
-
-    /**
-     * 
-     * @param {BracketObject} bracketData 
-     * @param {Number} yearsToInflate 
-     * @param {Number} inflation 
-     */
-    static inflateBracket(bracketData, yearsToInflate, inflation) {
-        const updatedBracket = JSON.parse(JSON.stringify(bracketData));
-
-        for (let i = 0; i < bracketData.brackets.length; i++) {
-            updatedBracket.brackets[i] = CanadianIncomeCalculator.futureValue(bracketData.brackets[i], 1, inflation, yearsToInflate);
-
-            if (i > 0) {
-                updatedBracket.base[i] = updatedBracket.brackets[i] * bracketData.rates[i - 1];
-            }
-        }
-
-        return updatedBracket;
     }
 
     /**
@@ -865,8 +812,8 @@ class CanadianIncomeTax {
      * @param {Number} inflation 
      */
     constructor(taxYear, inflation) {
-        this.fedTaxRates = new FederalTaxes(taxYear, inflation);
-        this.provTaxRates = new OntarioTaxes(taxYear, inflation);
+        this.fedTaxRates = new FederalTaxCalculations(taxYear, inflation);
+        this.provTaxRates = new ProvincialTaxCalculations(taxYear, inflation);
     }
 
     /**
@@ -874,13 +821,8 @@ class CanadianIncomeTax {
      * @param {TaxData} taxData 
      */
     adjustTaxBrackets(taxData) {
-        const taxableYear = taxData.ageInFuture - taxData.currentAge + taxData.year;
-        if (taxableYear === this.fedTaxRates.taxYear) {
-            return;
-        }
-
-        this.fedTaxRates = new FederalTaxes(taxableYear, taxData.inflation);
-        this.provTaxRates = new OntarioTaxes(taxableYear, taxData.inflation);
+        this.fedTaxRates.adjustTaxBrackets(taxData);
+        this.provTaxRates.adjustTaxBrackets(taxData);
     }
 
     /**
@@ -898,8 +840,8 @@ class CanadianIncomeTax {
 
         //  Some FEDERAL values are set in calculating federal tax, that are then used in provincial tax.
         //  SO - FED must be called first before PROV (sorry mr. immuteability)
-        const fedTax = this.getNetFederalTax(taxData, grossIncome);
-        const provTax = this.getNetProvincialTax(taxData, grossIncome);
+        const fedTax = this.fedTaxRates.getNetFederalTax(taxData, grossIncome);
+        const provTax = this.provTaxRates.getNetProvincialTax(taxData, grossIncome);
         taxData.subtotalFederalAndProvIncomeTaxes = fedTax + provTax;
         taxData.totalTaxesClawbacksAndCPP = taxData.subtotalFederalAndProvIncomeTaxes + taxData.oasClawback;
 
@@ -907,27 +849,87 @@ class CanadianIncomeTax {
     }
 
     /**
+     * Finds the taxable income to withdraw to receive the specified net income.
      * @param {TaxData} taxData
-     * @param {Number} grossIncome 
      * @returns {Number}
      */
-    getNetFederalTax(taxData, grossIncome) {
-        taxData.grossedUpEligibleDividends = this.fedTaxRates.dividendGrossUp * taxData.eligibleDividends;
-        taxData.grossedUpNonEligibleDividends = this.fedTaxRates.nonEligibleDividendGrossUp * taxData.nonEligibleDividends;
-        taxData.taxableCapitalGains = CanadianIncomeTax.calculateTaxInBracket(this.fedTaxRates.capitalGainsInfo, taxData.capitalGains);
-        taxData.totalIncomeForTaxPurposes = grossIncome + taxData.grossedUpEligibleDividends + taxData.taxableCapitalGains + taxData.grossedUpNonEligibleDividends;
-        taxData.oasClawback = this.getOASclawback(taxData.totalIncomeForTaxPurposes, taxData.OAS);
-        taxData.netIncomeForTaxPurposes = taxData.totalIncomeForTaxPurposes - taxData.oasClawback;
-        taxData.federalTaxBeforeCredits = CanadianIncomeTax.calculateTaxInBracket(this.fedTaxRates.taxBracketInfo, taxData.netIncomeForTaxPurposes);
+    getGrossIncome(taxData) {
+        //  Working from last known Canadian/Provincial tax rates, the brackets are adjusted for time/inflation.
+        this.adjustTaxBrackets(taxData);
 
-        let fedTaxCredits = this.getFederalTaxCredits(taxData, grossIncome + taxData.taxableCapitalGains);
-        if (fedTaxCredits > taxData.federalTaxBeforeCredits) {
-            fedTaxCredits = taxData.federalTaxBeforeCredits;
+        const fedGrossedUpDividends = this.fedTaxRates.dividendGrossUp * taxData.eligibleDividends;
+        const taxableCapitalGains = CanadianTaxUtils.calculateTaxInBracket(this.fedTaxRates.capitalGainsInfo, taxData.capitalGains);
+        const grossEstimate = taxData.incomes + fedGrossedUpDividends + taxableCapitalGains;
+        const marginalFedRate = CanadianTaxUtils.getMarginalTaxRate(this.fedTaxRates.taxBracketInfo, grossEstimate);
+        const marginalOntRate = CanadianTaxUtils.getMarginalTaxRate(this.provTaxRates.ontTaxBracketInfo, grossEstimate);
+        const ontHealthPremium = CanadianTaxUtils.calculateTaxInBracket(this.provTaxRates.ontHealthBracketInfo, grossEstimate);
+
+        //  Estimate of needed GROSS to cover taxes of net expected income.
+        let workingGrossIncome = taxData.incomes / (1 - (marginalFedRate + marginalOntRate)) + taxableCapitalGains + ontHealthPremium + taxData.eligibleDividends;
+
+        let totalTax = this.findTotalTax(taxData, workingGrossIncome);
+
+        let failSafe = 0;   //  It's possible some set of inputs will NEVER approach ZERO, so avoid an infinite loop.
+        let diff = taxData.incomes - (workingGrossIncome - totalTax);
+        while (Math.abs(diff) > 0.25 && failSafe < 999) {
+            //  Next guess at gross income      
+            const avgTaxRate = totalTax / (workingGrossIncome + fedGrossedUpDividends + taxableCapitalGains);
+            const incomeDelta = diff / (1 - avgTaxRate);
+            if (taxData.debug) Logger.log(`totalTax=${totalTax}. avgTax=${avgTaxRate}.  Delta=${incomeDelta}`);
+            workingGrossIncome = workingGrossIncome + incomeDelta;
+
+            totalTax = this.findTotalTax(taxData, workingGrossIncome);
+
+            if (workingGrossIncome <= 0.1) {
+                workingGrossIncome = totalTax;
+                break;
+            }
+
+            diff = taxData.incomes - (workingGrossIncome - totalTax);
+            failSafe++;
+            if (taxData.debug) Logger.log(`Net=${taxData.incomes}. Diff=${diff}. Working Gross=${workingGrossIncome}. Total Tax=${totalTax}. Failsafe=${failSafe}`);
         }
 
-        taxData.netFederalTax = taxData.federalTaxBeforeCredits - fedTaxCredits;
+        return workingGrossIncome;
+    }
+}
 
-        return taxData.netFederalTax;
+/**
+ * @classdesc Tax calculations for a Province of Canada
+ */
+class ProvincialTaxCalculations {
+    /**
+     * 
+     * @param {Number} taxYear 
+     * @param {Number} inflation 
+     */
+    constructor(taxYear, inflation) {
+        this.provTaxRates = new OntarioTaxes(taxYear, inflation);
+    }
+
+    get ontTaxBracketInfo() {
+        return this.provTaxRates.ontTaxBracketInfo;
+    }
+
+    get ontHealthBracketInfo() {
+        return this.provTaxRates.ontHealthBracketInfo;
+    }
+
+    get ageExcessPercent() {
+        return this.provTaxRates.ageExcessPercent;
+    }
+
+    /**
+     * 
+     * @param {TaxData} taxData 
+     */
+    adjustTaxBrackets(taxData) {
+        const taxableYear = taxData.ageInFuture - taxData.currentAge + taxData.year;
+        if (taxableYear === this.provTaxRates.taxYear) {
+            return;
+        }
+
+        this.provTaxRates = new OntarioTaxes(taxableYear, taxData.inflation);
     }
 
     /**
@@ -936,16 +938,11 @@ class CanadianIncomeTax {
      * @returns {Number}
      */
     getNetProvincialTax(taxData, grossIncome) {
-        taxData.ontHealthPremium = CanadianIncomeTax.calculateTaxInBracket(this.provTaxRates.ontHealthBracketInfo, taxData.netIncomeForTaxPurposes)
-        taxData.provTaxBeforeCredits = CanadianIncomeTax.calculateTaxInBracket(this.provTaxRates.ontTaxBracketInfo, taxData.netIncomeForTaxPurposes);
-             
+        taxData.ontHealthPremium = CanadianTaxUtils.calculateTaxInBracket(this.provTaxRates.ontHealthBracketInfo, taxData.netIncomeForTaxPurposes)
+        taxData.provTaxBeforeCredits = CanadianTaxUtils.calculateTaxInBracket(this.provTaxRates.ontTaxBracketInfo, taxData.netIncomeForTaxPurposes);
         taxData.totalProvNonRefundableTaxCreditsBeforeDividendTaxCredits = this.getProvincialTaxCredits(taxData, grossIncome + taxData.taxableCapitalGains)
-        if (taxData.totalProvNonRefundableTaxCreditsBeforeDividendTaxCredits > taxData.provTaxBeforeCredits) {
-            taxData.totalProvNonRefundableTaxCreditsBeforeDividendTaxCredits = taxData.provTaxBeforeCredits;
-        }
-
         taxData.provNetTaxBeforeDividendTaxCredit = taxData.provTaxBeforeCredits - taxData.totalProvNonRefundableTaxCreditsBeforeDividendTaxCredits;
-        taxData.ontSurtax = CanadianIncomeTax.calculateTaxInBracket(this.provTaxRates.ontSurtaxBracketInfo, taxData.provNetTaxBeforeDividendTaxCredit);
+        taxData.ontSurtax = CanadianTaxUtils.calculateTaxInBracket(this.provTaxRates.ontSurtaxBracketInfo, taxData.provNetTaxBeforeDividendTaxCredit);
         taxData.provEligibleDividendCredit = taxData.grossedUpEligibleDividends * this.provTaxRates.provEligibleDividendTaxCreditRate;
         taxData.provNonEligibleDividendCredit = taxData.grossedUpNonEligibleDividends * this.provTaxRates.provNonEligibleDividendTaxCreditRate;
 
@@ -963,6 +960,160 @@ class CanadianIncomeTax {
      * @param {Number} grossIncome 
      * @returns {Number}
      */
+    getProvincialTaxCredits(taxData, grossIncome) {
+        taxData.provincialEligiblePensionIncome = taxData.incomeEligibleForPensionCredit > this.provTaxRates.provMaxIncomePensionTaxCredit
+            ? this.provTaxRates.provMaxIncomePensionTaxCredit
+            : taxData.incomeEligibleForPensionCredit;
+
+        taxData.provAgeCredit = this.getAgeCredit(taxData.ageInFuture, grossIncome + taxData.grossedUpEligibleDividends, this.provTaxRates.ontAgeAmount, this.provTaxRates.ontAgeThreshold, this.provTaxRates.ageExcessPercent);
+        taxData.provincialMedicalExpenseCredit = this.getProvincialMedicalExpenseCredit(taxData);
+        taxData.provAdjustedBPA = this.getProvBasicPersonalAmount(taxData);
+        taxData.totalNonRefundableProvTaxCredits = taxData.provAdjustedBPA + taxData.provAgeCredit + taxData.provincialEligiblePensionIncome + taxData.provincialMedicalExpenseCredit;
+
+        const lowestTaxRate = CanadianTaxUtils.getMarginalTaxRate(this.provTaxRates.ontTaxBracketInfo, 0);
+        taxData.provDonationsTaxCredit = CanadianTaxUtils.calculateTaxInBracket(this.provTaxRates.charityBrackets, taxData.charitableDonations);
+
+        const provincialTaxCredits = taxData.totalNonRefundableProvTaxCredits * lowestTaxRate + taxData.provDonationsTaxCredit;
+
+        if (provincialTaxCredits > taxData.provTaxBeforeCredits) {
+            return taxData.provTaxBeforeCredits;
+        }
+
+        return provincialTaxCredits;
+    }
+
+    /**
+     * 
+     * @param {TaxData} taxData 
+     * @returns 
+     */
+    getProvBasicPersonalAmount(taxData) {
+        return this.provTaxRates.ontBasicPersonAmount;
+    }
+
+    /**
+     * 
+     * @param {Number} age 
+     * @param {Number} grossIncome 
+     * @param {Number} ageAmount 
+     * @param {Number} thresholdAmount 
+     * @param {Number} deductPercent 
+     * @returns {Number}
+     */
+    getAgeCredit(age, grossIncome, ageAmount, thresholdAmount, deductPercent) {
+        if (age < this.provTaxRates.ageCreditAge) {
+            return 0.0;
+        }
+        if (grossIncome < thresholdAmount) {
+            return ageAmount;
+        }
+
+        const Excess = grossIncome - thresholdAmount;
+        const deduct = Excess * deductPercent;
+        let ageCredit = ageAmount - deduct;
+        if (ageCredit < 0) {
+            ageCredit = 0;
+        }
+
+        return ageCredit;
+    }
+
+    /**
+     * 
+     * @param {TaxData} taxData 
+     * @returns {Number}
+     */
+    getProvincialMedicalExpenseCredit(taxData) {
+        let thresholdValue = taxData.netIncomeForTaxPurposes * this.provTaxRates.medicalExpenseThresholdPercent;
+        thresholdValue = this.provTaxRates.medicalExpenseThreshold < thresholdValue
+            ? this.provTaxRates.medicalExpenseThreshold
+            : thresholdValue;
+
+        const medicalExpenseCreditAmount = taxData.medicalExpenses - thresholdValue;
+
+        return medicalExpenseCreditAmount <= 0 ? 0 : medicalExpenseCreditAmount;
+    }
+
+}
+
+/**
+ * @classdesc Canadian Federal Tax calculations. 
+ */
+class FederalTaxCalculations {
+    /**
+     * 
+     * @param {Number} taxYear 
+     * @param {Number} inflation 
+     */
+    constructor(taxYear, inflation) {
+        this.fedTaxRates = new FederalTaxes(taxYear, inflation);
+    }
+
+    get dividendGrossUp() {
+        return this.fedTaxRates.dividendGrossUp;
+    }
+
+    get capitalGainsInfo() {
+        return this.fedTaxRates.capitalGainsInfo;
+    }
+
+    get taxBracketInfo() {
+        return this.fedTaxRates.taxBracketInfo;
+    }
+
+    /**
+     * 
+     * @param {TaxData} taxData 
+     */
+    adjustTaxBrackets(taxData) {
+        const taxableYear = taxData.ageInFuture - taxData.currentAge + taxData.year;
+        if (taxableYear === this.fedTaxRates.taxYear) {
+            return;
+        }
+
+        this.fedTaxRates = new FederalTaxes(taxableYear, taxData.inflation);
+    }
+
+    /**
+     * @param {TaxData} taxData
+     * @param {Number} grossIncome 
+     * @returns {Number}
+     */
+    getNetFederalTax(taxData, grossIncome) {
+        taxData.grossedUpEligibleDividends = this.fedTaxRates.dividendGrossUp * taxData.eligibleDividends;
+        taxData.grossedUpNonEligibleDividends = this.fedTaxRates.nonEligibleDividendGrossUp * taxData.nonEligibleDividends;
+        taxData.taxableCapitalGains = CanadianTaxUtils.calculateTaxInBracket(this.fedTaxRates.capitalGainsInfo, taxData.capitalGains);
+        taxData.totalIncomeForTaxPurposes = grossIncome + taxData.grossedUpEligibleDividends + taxData.taxableCapitalGains + taxData.grossedUpNonEligibleDividends;
+        taxData.oasClawback = this.getOASclawback(taxData.totalIncomeForTaxPurposes, taxData.OAS);
+        taxData.netIncomeForTaxPurposes = taxData.totalIncomeForTaxPurposes - taxData.oasClawback;
+        taxData.federalTaxBeforeCredits = CanadianTaxUtils.calculateTaxInBracket(this.fedTaxRates.taxBracketInfo, taxData.netIncomeForTaxPurposes);
+        const fedTaxCredits = this.getFederalTaxCredits(taxData, grossIncome + taxData.taxableCapitalGains);
+        taxData.netFederalTax = taxData.federalTaxBeforeCredits - fedTaxCredits;
+
+        return taxData.netFederalTax;
+    }
+
+    /**
+     * 
+     * @param {Number} income 
+     * @param {Number} OAS
+     * @returns {Number} 
+     */
+    getOASclawback(income, OAS) {
+        let clawback = 0;
+
+        if (income > this.fedTaxRates.OASclawbackThreshold) {
+            clawback = (income - this.fedTaxRates.OASclawbackThreshold) * this.fedTaxRates.OASclawbackRate;
+            clawback = clawback >= OAS ? OAS : clawback;
+        }
+        return clawback;
+    }
+
+    /**
+     * @param {TaxData} taxData
+     * @param {Number} grossIncome 
+     * @returns {Number}
+     */
     getFederalTaxCredits(taxData, grossIncome) {
         taxData.fedEligiblePensionIncome = taxData.incomeEligibleForPensionCredit > this.fedTaxRates.maxIncomePensionTaxCredit
             ? this.fedTaxRates.maxIncomePensionTaxCredit
@@ -972,16 +1123,45 @@ class CanadianIncomeTax {
         taxData.AdjustedBPA = this.getFederalBasicPersonalAmount(taxData);
         taxData.fedMedicalExpenseCreditAmount = this.getFederalMedicalExpenseCredit(taxData);
         taxData.totalNonRefundableFedTaxCredits = taxData.AdjustedBPA + taxData.federalAgeCredit + taxData.fedEligiblePensionIncome + taxData.fedMedicalExpenseCreditAmount;
-
-        taxData.fedDonationsTaxCredit = CanadianIncomeTax.calculateTaxInBracket(this.fedTaxRates.charityBrackets, taxData.charitableDonations);
-
-        const lowestTaxRate = CanadianIncomeTax.getMarginalTaxRate(this.fedTaxRates.taxBracketInfo, 0);
+        taxData.fedDonationsTaxCredit = CanadianTaxUtils.calculateTaxInBracket(this.fedTaxRates.charityBrackets, taxData.charitableDonations);
+        const lowestTaxRate = CanadianTaxUtils.getMarginalTaxRate(this.fedTaxRates.taxBracketInfo, 0);
         taxData.totalFedNonRefundableTaxCreditsBeforeDividendTaxCredits = taxData.totalNonRefundableFedTaxCredits * lowestTaxRate + taxData.fedDonationsTaxCredit;
         const dividendTaxCredits = taxData.grossedUpEligibleDividends * this.fedTaxRates.eligibleDividendTaxCreditRate;
         const nonEligibleDividendTaxCredits = taxData.grossedUpNonEligibleDividends * this.fedTaxRates.nonEligibleDividendTaxCreditRate;
         const totalFedCredits = taxData.totalFedNonRefundableTaxCreditsBeforeDividendTaxCredits + dividendTaxCredits + nonEligibleDividendTaxCredits;
 
+        if (totalFedCredits > taxData.federalTaxBeforeCredits) {
+            return taxData.federalTaxBeforeCredits;
+        }
+
         return totalFedCredits;
+    }
+
+    /**
+     * 
+     * @param {Number} age 
+     * @param {Number} grossIncome 
+     * @param {Number} ageAmount 
+     * @param {Number} thresholdAmount 
+     * @param {Number} deductPercent 
+     * @returns {Number}
+     */
+    getAgeCredit(age, grossIncome, ageAmount, thresholdAmount, deductPercent) {
+        if (age < this.fedTaxRates.ageCreditAge) {
+            return 0.0;
+        }
+        if (grossIncome < thresholdAmount) {
+            return ageAmount;
+        }
+
+        const Excess = grossIncome - thresholdAmount;
+        const deduct = Excess * deductPercent;
+        let ageCredit = ageAmount - deduct;
+        if (ageCredit < 0) {
+            ageCredit = 0;
+        }
+
+        return ageCredit;
     }
 
     /**
@@ -1019,150 +1199,64 @@ class CanadianIncomeTax {
 
         return medicalExpenseCreditAmount <= 0 ? 0 : medicalExpenseCreditAmount;
     }
+}
 
+class CanadianTaxUtils {
     /**
-     * @param {TaxData} taxData
-     * @param {Number} grossIncome 
-     * @returns {Number}
+     * When you request a single column of data from getRange(), it is still a double array.
+     * Convert to single array for reguar array processing.
+     * @param {any[][]} doubleArray 
+     * @param {Number} columnNumber 
+     * @returns {any[]}
      */
-    getProvincialTaxCredits(taxData, grossIncome) {
-        taxData.provincialEligiblePensionIncome = taxData.incomeEligibleForPensionCredit > this.provTaxRates.provMaxIncomePensionTaxCredit
-            ? this.provTaxRates.provMaxIncomePensionTaxCredit
-            : taxData.incomeEligibleForPensionCredit;
+    static convertRowsToSingleArray(doubleArray, columnNumber = 0) {
+        if (!Array.isArray(doubleArray)) {
+            return doubleArray;
+        }
 
-        taxData.provAgeCredit = this.getAgeCredit(taxData.ageInFuture, grossIncome + taxData.grossedUpEligibleDividends, this.provTaxRates.ontAgeAmount, this.provTaxRates.ontAgeThreshold, this.fedTaxRates.ageExcessPercent);
-        taxData.provincialMedicalExpenseCredit = this.getProvincialMedicalExpenseCredit(taxData);
-        taxData.provAdjustedBPA = this.getProvBasicPersonalAmount(taxData);
-        taxData.totalNonRefundableProvTaxCredits = taxData.provAdjustedBPA + taxData.provAgeCredit + taxData.provincialEligiblePensionIncome + taxData.provincialMedicalExpenseCredit;   
-        
-        const lowestTaxRate = CanadianIncomeTax.getMarginalTaxRate(this.provTaxRates.ontTaxBracketInfo, 0);
-        taxData.provDonationsTaxCredit = CanadianIncomeTax.calculateTaxInBracket(this.provTaxRates.charityBrackets, taxData.charitableDonations);
-
-        const provincialTaxCredits = taxData.totalNonRefundableProvTaxCredits * lowestTaxRate + taxData.provDonationsTaxCredit;
-
-        return provincialTaxCredits;
+        return doubleArray.map(item => item[columnNumber]);
     }
 
     /**
      * 
-     * @param {TaxData} taxData 
+     * @param {Number} pv = Present Value
+     * @param {Number} freq = compounding frequency
+     * @param {Number} rate = interest rate (expressed as %)
+     * @param {Number} periods = number of periods until maturity
      * @returns 
      */
-    getProvBasicPersonalAmount(taxData) {
-        return this.provTaxRates.ontBasicPersonAmount;
+    static futureValue(pv, freq, rate, periods) {
+        return (pv * Math.pow(1 + (rate / 100 / freq), periods));
     }
 
     /**
      * 
-     * @param {Number} age 
-     * @param {Number} grossIncome 
-     * @param {Number} ageAmount 
-     * @param {Number} thresholdAmount 
-     * @param {Number} deductPercent 
-     * @returns {Number}
+     * @param {BracketObject} bracketData 
+     * @param {Number} yearsToInflate 
+     * @param {Number} inflation 
      */
-    getAgeCredit(age, grossIncome, ageAmount, thresholdAmount, deductPercent) {
-        if (age < this.fedTaxRates.ageCreditAge) {
-            return 0.0;
-        }
-        if (grossIncome < thresholdAmount) {
-            return ageAmount;
-        }
+    static inflateBracket(bracketData, yearsToInflate, inflation) {
+        const updatedBracket = JSON.parse(JSON.stringify(bracketData));
 
-        const Excess = grossIncome - thresholdAmount;
-        const deduct = Excess * deductPercent;
-        let ageCredit = ageAmount - deduct;
-        if (ageCredit < 0) {
-            ageCredit = 0;
-        }
+        for (let i = 0; i < bracketData.brackets.length; i++) {
+            updatedBracket.brackets[i] = CanadianTaxUtils.futureValue(bracketData.brackets[i], 1, inflation, yearsToInflate);
 
-        return ageCredit;
-    }
-
-    /**
-     * 
-     * @param {TaxData} taxData 
-     * @returns {Number}
-     */
-    getProvincialMedicalExpenseCredit(taxData) {
-        let thresholdValue = taxData.netIncomeForTaxPurposes * this.provTaxRates.medicalExpenseThresholdPercent;
-        thresholdValue = this.provTaxRates.medicalExpenseThreshold < thresholdValue
-            ? this.provTaxRates.medicalExpenseThreshold
-            : thresholdValue;
-
-        const medicalExpenseCreditAmount = taxData.medicalExpenses - thresholdValue;
-
-        return medicalExpenseCreditAmount <= 0 ? 0 : medicalExpenseCreditAmount;
-    }
-
-    /**
-     * Finds the taxable income to withdraw to receive the specified net income.
-     * @param {TaxData} taxData
-     * @returns {Number}
-     */
-    getGrossIncome(taxData) {
-        //  Working from last known Canadian/Provincial tax rates, the brackets are adjusted for time/inflation.
-        this.adjustTaxBrackets(taxData);
-
-        const fedGrossedUpDividends = this.fedTaxRates.dividendGrossUp * taxData.eligibleDividends;
-        const taxableCapitalGains = CanadianIncomeTax.calculateTaxInBracket(this.fedTaxRates.capitalGainsInfo, taxData.capitalGains);
-        const grossEstimate = taxData.incomes + fedGrossedUpDividends + taxableCapitalGains;
-        const marginalFedRate = CanadianIncomeTax.getMarginalTaxRate(this.fedTaxRates.taxBracketInfo, grossEstimate);
-        const marginalOntRate = CanadianIncomeTax.getMarginalTaxRate(this.provTaxRates.ontTaxBracketInfo, grossEstimate);
-        const ontHealthPremium = CanadianIncomeTax.calculateTaxInBracket(this.provTaxRates.ontHealthBracketInfo, grossEstimate);
-
-        //  Estimate of needed GROSS to cover taxes of net expected income.
-        let workingGrossIncome = taxData.incomes / (1 - (marginalFedRate + marginalOntRate)) + taxableCapitalGains + ontHealthPremium + taxData.eligibleDividends;
-
-        let totalTax = this.findTotalTax(taxData, workingGrossIncome);
-
-        let failSafe = 0;   //  It's possible some set of inputs will NEVER approach ZERO, so avoid an infinite loop.
-        let diff = taxData.incomes - (workingGrossIncome - totalTax);
-        while (Math.abs(diff) > 0.25 && failSafe < 999) {
-            //  Next guess at gross income      
-            const avgTaxRate = totalTax / (workingGrossIncome + fedGrossedUpDividends + taxableCapitalGains);
-            const incomeDelta = diff / (1 - avgTaxRate);
-            if (taxData.debug) Logger.log(`totalTax=${totalTax}. avgTax=${avgTaxRate}.  Delta=${incomeDelta}`);
-            workingGrossIncome = workingGrossIncome + incomeDelta;
-
-            totalTax = this.findTotalTax(taxData, workingGrossIncome);
-
-            if (workingGrossIncome <= 0.1) {
-                workingGrossIncome = totalTax;
-                break;
+            if (i > 0) {
+                //  BASE[i] = BASE[i-1] + RATE[i-1] * (BRACKET[i]- BRACKET[i-1])
+                updatedBracket.base[i] = updatedBracket.base[i - 1] + updatedBracket.rates[i - 1] * (updatedBracket.brackets[i] - updatedBracket.brackets[i - 1]);
             }
-
-            diff = taxData.incomes - (workingGrossIncome - totalTax);
-            failSafe++;
-            if (taxData.debug) Logger.log(`Net=${taxData.incomes}. Diff=${diff}. Working Gross=${workingGrossIncome}. Total Tax=${totalTax}. Failsafe=${failSafe}`);
         }
 
-        return workingGrossIncome;
+        return updatedBracket;
     }
 
     /**
-     * 
-     * @param {Number} income 
-     * @param {Number} OAS
-     * @returns {Number} 
-     */
-    getOASclawback(income, OAS) {
-        let clawback = 0;
-
-        if (income > this.fedTaxRates.OASclawbackThreshold) {
-            clawback = (income - this.fedTaxRates.OASclawbackThreshold) * this.fedTaxRates.OASclawbackRate;
-            clawback = clawback >= OAS ? OAS : clawback;
-        }
-        return clawback;
-    }
-
-    /**
-     * 
-     * @param {BracketObject} bracketInfo 
-     * @param {Number} dollarAmount 
-     */
+      * 
+      * @param {BracketObject} bracketInfo 
+      * @param {Number} dollarAmount 
+      */
     static calculateTaxInBracket(bracketInfo, dollarAmount) {
-        const bracketIndex = CanadianIncomeTax.findBracket(dollarAmount, bracketInfo);
+        const bracketIndex = CanadianTaxUtils.findBracket(dollarAmount, bracketInfo);
 
         const rate = bracketInfo.rates[bracketIndex];
         const baseTax = bracketInfo.base[bracketIndex];
@@ -1178,7 +1272,7 @@ class CanadianIncomeTax {
      * @returns 
      */
     static getMarginalTaxRate(bracketInfo, dollarAmount) {
-        const bracket = CanadianIncomeTax.findBracket(dollarAmount, bracketInfo);
+        const bracket = CanadianTaxUtils.findBracket(dollarAmount, bracketInfo);
         return bracketInfo.rates[bracket];
     }
 
@@ -1200,21 +1294,9 @@ class CanadianIncomeTax {
     }
 }
 
-/*  *** DEBUG START ***
+//  *** DEBUG START ***
 //  Remove comments for testing in NODE
-function taxTester() {
-    console.log("Starting Canadian Tax Test");
-    for (const testItem of TestCantaxData) {
-        const grossIncome = GET_GROSS_INCOMES_V2(testItem[1], testItem[0], 59, 0, 2025, testItem[4], testItem[3], testItem[5], testItem[6], 0, 0, false);
-        const grossRounded = Math.round(grossIncome[0][0]);
-        const grossDiff = grossRounded - testItem[2];
-        const successMsg = grossDiff <= 1.0 ? "Success" : "Fail";
-
-        Logger.log(`GROSS INCOME = ${grossRounded}.  STATUS = ${successMsg}.   Net Income =${testItem[1]}. Age=${testItem[0]}. Capital Gains=${testItem[4]}. Dividends=${testItem[3]}. OAS=${testItem[5]}. Pension=${testItem[6]} `);
-    }
-}
 
 // getGross();
-// taxTester();
 TEST_CANTAX();
 //  *** DEBUG END ***/
