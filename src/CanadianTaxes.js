@@ -72,7 +72,7 @@ function TEST_CANTAX() {
         [2030, 69, 80000.00, 144461.00, 50000.00, 20000.00, 2000.00, 9416.00, 2000.00, 4000.00, 1000.00, 2.00]
     ];
 
-    const calcColums = ["Gross Income (calculated)", "Gross Diff", "Pass/Fail", "Net Income (calculated)", "Net Diff", "Pass/Fail"];
+    const calcColums = ["Gross Income (calculated)", "Gross Diff", "Pass/Fail", "Net Income (calculated)", "Net Diff", "Pass/Fail", "Taxes"];
     const output = [[...TestCantaxData[0], ...calcColums]];
     const EXPECTED_GROSS_COL = TestCantaxData[0].indexOf("Expected Gross Taxable Income");
     const FUTURE_AGE_COL = TestCantaxData[0].indexOf("Age");
@@ -122,13 +122,29 @@ function TEST_CANTAX() {
             showDebug
         );
 
+        const taxes = GET_INCOMETAX_V2(testItem[EXPECTED_GROSS_COL],  // Income
+            testItem[FUTURE_AGE_COL],                                       // Future age
+            Number(testItem[FUTURE_AGE_COL]),                               // Current age
+            Number(testItem[INFLATION_COL]),                                                              // Inflation
+            Number(testItem[YEAR_COL]),                                     // Tax year
+            testItem[GAINS_COL],                                            // Capital gains
+            testItem[ELIG_DIV_COL],                                         // Eligible Dividends
+            testItem[OAS_COL],                                              // OAS
+            testItem[PENSION_COL],                                          // Pension credit income 
+            testItem[MEDICAL_COL],                                          // Medical expenses
+            testItem[NON_ELIG_DIV_COL],                                     // Non eligible dividends
+            testItem[CHARITY_COL],                                          // Charitable donations
+            showDebug
+        );
+
         const grossDiff = Math.round(grossIncome[0][0]) - Number(testItem[EXPECTED_GROSS_COL]);
         const grossStatus = Math.abs(grossDiff) <= 1.0 ? "Pass" : "** FAIL **";
 
         const netDiff = Math.round(netIncome[0][0]) - Number(testItem[NET_INCOME_COL]);
         const netStatus = Math.abs(netDiff) <= 1.0 ? "Pass" : "** FAIL **";
-        const calculatedData = [grossIncome[0][0], grossDiff, grossStatus, netIncome[0][0], netDiff, netStatus];
-        Logger.log(calculatedData);
+        const calculatedData = [grossIncome[0][0], grossDiff, grossStatus, netIncome[0][0], netDiff, netStatus, taxes];
+        const logStr = calculatedData.join(", ");
+        Logger.log(logStr);
         systemStatus = Math.abs(grossDiff) > 1 || Math.abs(netDiff) > 1 ? false : systemStatus;
         // @ts-ignore
         output.push([...testItem, ...calculatedData]);
