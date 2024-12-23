@@ -65,7 +65,7 @@ function TEST_CANTAX() {
         const grossIncome = GET_GROSS_INCOMES_V2(testItem[NET_INCOME_COL],  // Income
             testItem[FUTURE_AGE_COL],                                       // Future age
             Number(testItem[FUTURE_AGE_COL]),                               // Current age
-            Number(testItem[INFLATION_COL]),                                                              // Inflation
+            Number(testItem[INFLATION_COL]),                                // Inflation
             Number(testItem[YEAR_COL]),                                     // Tax year
             testItem[GAINS_COL],                                            // Capital gains
             testItem[ELIG_DIV_COL],                                         // Eligible Dividends
@@ -80,7 +80,7 @@ function TEST_CANTAX() {
         const netIncome = GET_NET_INCOMES_V2(testItem[EXPECTED_GROSS_COL],  // Income
             testItem[FUTURE_AGE_COL],                                       // Future age
             Number(testItem[FUTURE_AGE_COL]),                               // Current age
-            Number(testItem[INFLATION_COL]),                                                              // Inflation
+            Number(testItem[INFLATION_COL]),                                // Inflation
             Number(testItem[YEAR_COL]),                                     // Tax year
             testItem[GAINS_COL],                                            // Capital gains
             testItem[ELIG_DIV_COL],                                         // Eligible Dividends
@@ -95,7 +95,7 @@ function TEST_CANTAX() {
         const taxes = GET_INCOMETAX_V2(testItem[EXPECTED_GROSS_COL],  // Income
             testItem[FUTURE_AGE_COL],                                       // Future age
             Number(testItem[FUTURE_AGE_COL]),                               // Current age
-            Number(testItem[INFLATION_COL]),                                                              // Inflation
+            Number(testItem[INFLATION_COL]),                                // Inflation
             Number(testItem[YEAR_COL]),                                     // Tax year
             testItem[GAINS_COL],                                            // Capital gains
             testItem[ELIG_DIV_COL],                                         // Eligible Dividends
