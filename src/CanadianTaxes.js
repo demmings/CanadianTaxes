@@ -817,8 +817,8 @@ class CanadianIncomeTax {
      * @param {Number} inflation 
      */
     constructor(taxYear, inflation) {
-        this.fedTaxRates = new FederalTaxCalculations(taxYear, inflation);
-        this.provTaxRates = new ProvincialTaxCalculations(taxYear, inflation);
+        this.fedTaxCalculations = new FederalTaxCalculations(taxYear, inflation);
+        this.provTaxCalculations = new ProvincialTaxCalculations(taxYear, inflation);
     }
 
     /**
@@ -826,8 +826,8 @@ class CanadianIncomeTax {
      * @param {TaxData} taxData 
      */
     adjustTaxBrackets(taxData) {
-        this.fedTaxRates.adjustTaxBrackets(taxData);
-        this.provTaxRates.adjustTaxBrackets(taxData);
+        this.fedTaxCalculations.adjustTaxBrackets(taxData);
+        this.provTaxCalculations.adjustTaxBrackets(taxData);
     }
 
     /**
@@ -845,8 +845,8 @@ class CanadianIncomeTax {
 
         //  Some FEDERAL values are set in calculating federal tax, that are then used in provincial tax.
         //  SO - FED must be called first before PROV (sorry mr. immuteability)
-        const fedTax = this.fedTaxRates.getNetFederalTax(taxData, grossIncome);
-        const provTax = this.provTaxRates.getNetProvincialTax(taxData, grossIncome);
+        const fedTax = this.fedTaxCalculations.getNetFederalTax(taxData, grossIncome);
+        const provTax = this.provTaxCalculations.getNetProvincialTax(taxData, grossIncome);
         taxData.subtotalFederalAndProvIncomeTaxes = fedTax + provTax;
         taxData.totalTaxesClawbacksAndCPP = taxData.subtotalFederalAndProvIncomeTaxes + taxData.oasClawback;
 
@@ -862,12 +862,12 @@ class CanadianIncomeTax {
         //  Working from last known Canadian/Provincial tax rates, the brackets are adjusted for time/inflation.
         this.adjustTaxBrackets(taxData);
 
-        const fedGrossedUpDividends = this.fedTaxRates.dividendGrossUp * taxData.eligibleDividends;
-        const taxableCapitalGains = CanadianTaxUtils.calculateTaxInBracket(this.fedTaxRates.capitalGainsInfo, taxData.capitalGains);
+        const fedGrossedUpDividends = this.fedTaxCalculations.dividendGrossUp * taxData.eligibleDividends;
+        const taxableCapitalGains = CanadianTaxUtils.calculateTaxInBracket(this.fedTaxCalculations.capitalGainsInfo, taxData.capitalGains);
         const grossEstimate = taxData.incomes + fedGrossedUpDividends + taxableCapitalGains;
-        const marginalFedRate = CanadianTaxUtils.getMarginalTaxRate(this.fedTaxRates.taxBracketInfo, grossEstimate);
-        const marginalOntRate = CanadianTaxUtils.getMarginalTaxRate(this.provTaxRates.ontTaxBracketInfo, grossEstimate);
-        const ontHealthPremium = CanadianTaxUtils.calculateTaxInBracket(this.provTaxRates.ontHealthBracketInfo, grossEstimate);
+        const marginalFedRate = CanadianTaxUtils.getMarginalTaxRate(this.fedTaxCalculations.taxBracketInfo, grossEstimate);
+        const marginalOntRate = CanadianTaxUtils.getMarginalTaxRate(this.provTaxCalculations.ontTaxBracketInfo, grossEstimate);
+        const ontHealthPremium = CanadianTaxUtils.calculateTaxInBracket(this.provTaxCalculations.ontHealthBracketInfo, grossEstimate);
 
         //  Estimate of needed GROSS to cover taxes of net expected income.
         let workingGrossIncome = taxData.incomes / (1 - (marginalFedRate + marginalOntRate)) + taxableCapitalGains + ontHealthPremium + taxData.eligibleDividends;
@@ -918,10 +918,6 @@ class ProvincialTaxCalculations {
 
     get ontHealthBracketInfo() {
         return this.provTaxRates.ontHealthBracketInfo;
-    }
-
-    get ageExcessPercent() {
-        return this.provTaxRates.ageExcessPercent;
     }
 
     /**
