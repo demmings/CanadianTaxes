@@ -158,7 +158,7 @@ function TEST_CANTAX() {
  * Basically, we are trying to find how much to withdraw from RRSP so RRSP = gross - (CPP + OAS + other taxable sources)
  * @customfunction
  */
-function GET_GROSS_INCOMES_V2(income = 0, ageInFuture = 60, currentAge = null, projectedInflation = null, taxYear = null, projectedGains = null, projectedDividends = null, yearlyOAS = null, incomeEligibleForPensionCredit = null, medicalExpenses = null, nonEligibleDividends = null, donations = null, debug = true) {
+function GET_GROSS_INCOMES_V2(income = 0, ageInFuture = 60, currentAge = null, projectedInflation = null, taxYear = null, projectedGains = null, projectedDividends = null, yearlyOAS = null, incomeEligibleForPensionCredit = null, medicalExpenses = null, nonEligibleDividends = null, donations = null, debug = false) {
     if (debug) Logger.log("GET_GROSS_INCOMES");
 
     const taxData = CanadianIncomeCalculator.validateIncomeSettings(income,
@@ -194,7 +194,7 @@ function GET_GROSS_INCOMES_V2(income = 0, ageInFuture = 60, currentAge = null, p
  * @returns {Number[][]}
  * @customfunction
  */
-function GET_NET_INCOMES_V2(yearlyGrossIncome = 0, ageInFuture = 60, currentAge = null, inflation = null, taxYear = null, capitalGains = null, dividendIncome = null, OAS = null, pension = null, medicalExpenses = null, nonEligibleDividends = null, donations = null, debug = true) {
+function GET_NET_INCOMES_V2(yearlyGrossIncome = 0, ageInFuture = 60, currentAge = null, inflation = null, taxYear = null, capitalGains = null, dividendIncome = null, OAS = null, pension = null, medicalExpenses = null, nonEligibleDividends = null, donations = null, debug = false) {
     const taxData = CanadianIncomeCalculator.validateIncomeSettings(yearlyGrossIncome,
         ageInFuture,
         currentAge,
@@ -850,12 +850,13 @@ class CanadianIncomeTax {
         //  Working from last known Canadian/Provincial tax rates, the brackets are adjusted for time/inflation.
         this.adjustTaxBrackets(taxData);
 
-        const fedGrossedUpDividends = this.fedTaxCalculations.dividendGrossUp * taxData.eligibleDividends;
-        const taxableCapitalGains = CanadianTaxUtils.calculateTaxInBracket(this.fedTaxCalculations.capitalGainsInfo, taxData.capitalGains);
-        const grossEstimate = taxData.incomes + fedGrossedUpDividends + taxableCapitalGains;
-        const marginalFedRate = CanadianTaxUtils.getMarginalTaxRate(this.fedTaxCalculations.taxBracketInfo, grossEstimate);
-        const marginalOntRate = CanadianTaxUtils.getMarginalTaxRate(this.provTaxCalculations.ontTaxBracketInfo, grossEstimate);
-        const ontHealthPremium = CanadianTaxUtils.calculateTaxInBracket(this.provTaxCalculations.ontHealthBracketInfo, grossEstimate);
+        const fedGrossedUpEligibleDividends = this.fedTaxCalculations.getGrossedUpEligibleDividends(taxData.eligibleDividends);
+        const fedGrossedUpNonEligibleDividends = this.fedTaxCalculations.getGrossedUpNonEligibleDividends(taxData.nonEligibleDividends);
+        const taxableCapitalGains = this.fedTaxCalculations.getTaxableCapitalGains(taxData.capitalGains);
+        const grossEstimate = taxData.incomes + fedGrossedUpEligibleDividends + fedGrossedUpNonEligibleDividends + taxableCapitalGains;
+        const marginalFedRate = this.fedTaxCalculations.getMarginalTaxRate(grossEstimate);
+        const marginalOntRate = this.provTaxCalculations.getMarginalTaxRate(grossEstimate);
+        const ontHealthPremium = this.provTaxCalculations.getOntHealthPremium(grossEstimate);
 
         //  Estimate of needed GROSS to cover taxes of net expected income.
         let workingGrossIncome = taxData.incomes / (1 - (marginalFedRate + marginalOntRate)) + taxableCapitalGains + ontHealthPremium + taxData.eligibleDividends;
@@ -866,7 +867,7 @@ class CanadianIncomeTax {
         let diff = taxData.incomes - (workingGrossIncome - totalTax);
         while (Math.abs(diff) > 0.25 && failSafe < 999) {
             //  Next guess at gross income      
-            const avgTaxRate = totalTax / (workingGrossIncome + fedGrossedUpDividends + taxableCapitalGains);
+            const avgTaxRate = totalTax / (workingGrossIncome + fedGrossedUpEligibleDividends + fedGrossedUpNonEligibleDividends + taxableCapitalGains);
             const incomeDelta = diff / (1 - avgTaxRate);
             if (taxData.debug) Logger.log(`totalTax=${totalTax}. avgTax=${avgTaxRate}.  Delta=${incomeDelta}`);
             workingGrossIncome = workingGrossIncome + incomeDelta;
@@ -898,14 +899,6 @@ class ProvincialTaxCalculations {
      */
     constructor(taxYear, inflation) {
         this.provTaxRates = new OntarioTaxes(taxYear, inflation);
-    }
-
-    get ontTaxBracketInfo() {
-        return this.provTaxRates.ontTaxBracketInfo;
-    }
-
-    get ontHealthBracketInfo() {
-        return this.provTaxRates.ontHealthBracketInfo;
     }
 
     /**
@@ -959,7 +952,7 @@ class ProvincialTaxCalculations {
         taxData.provAdjustedBPA = this.getProvBasicPersonalAmount(taxData);
         taxData.totalNonRefundableProvTaxCredits = taxData.provAdjustedBPA + taxData.provAgeCredit + taxData.provincialEligiblePensionIncome + taxData.provincialMedicalExpenseCredit;
 
-        const lowestTaxRate = CanadianTaxUtils.getMarginalTaxRate(this.provTaxRates.ontTaxBracketInfo, 0);
+        const lowestTaxRate = this.getMarginalTaxRate(0);
         taxData.provDonationsTaxCredit = CanadianTaxUtils.calculateTaxInBracket(this.provTaxRates.charityBrackets, taxData.charitableDonations);
 
         const provincialTaxCredits = taxData.totalNonRefundableProvTaxCredits * lowestTaxRate + taxData.provDonationsTaxCredit;
@@ -978,6 +971,24 @@ class ProvincialTaxCalculations {
      */
     getProvBasicPersonalAmount(taxData) {
         return this.provTaxRates.ontBasicPersonAmount;
+    }
+
+    /**
+     * 
+     * @param {Number} gross 
+     * @returns {Number}
+     */
+    getMarginalTaxRate(gross) {
+        return CanadianTaxUtils.getMarginalTaxRate(this.provTaxRates.ontTaxBracketInfo, gross);
+    }
+
+    /**
+     * 
+     * @param {Number} gross 
+     * @returns {Number}
+     */
+    getOntHealthPremium(gross) {
+        return CanadianTaxUtils.calculateTaxInBracket(this.provTaxRates.ontHealthBracketInfo, gross);
     }
 
     /**
@@ -1038,18 +1049,6 @@ class FederalTaxCalculations {
         this.fedTaxRates = new FederalTaxes(taxYear, inflation);
     }
 
-    get dividendGrossUp() {
-        return this.fedTaxRates.dividendGrossUp;
-    }
-
-    get capitalGainsInfo() {
-        return this.fedTaxRates.capitalGainsInfo;
-    }
-
-    get taxBracketInfo() {
-        return this.fedTaxRates.taxBracketInfo;
-    }
-
     /**
      * 
      * @param {TaxData} taxData 
@@ -1069,9 +1068,9 @@ class FederalTaxCalculations {
      * @returns {Number}
      */
     getNetFederalTax(taxData, grossIncome) {
-        taxData.grossedUpEligibleDividends = this.fedTaxRates.dividendGrossUp * taxData.eligibleDividends;
-        taxData.grossedUpNonEligibleDividends = this.fedTaxRates.nonEligibleDividendGrossUp * taxData.nonEligibleDividends;
-        taxData.taxableCapitalGains = CanadianTaxUtils.calculateTaxInBracket(this.fedTaxRates.capitalGainsInfo, taxData.capitalGains);
+        taxData.grossedUpEligibleDividends = this.getGrossedUpEligibleDividends(taxData.eligibleDividends);
+        taxData.grossedUpNonEligibleDividends = this.getGrossedUpNonEligibleDividends(taxData.nonEligibleDividends);
+        taxData.taxableCapitalGains = this.getTaxableCapitalGains(taxData.capitalGains);
         taxData.totalIncomeForTaxPurposes = grossIncome + taxData.grossedUpEligibleDividends + taxData.taxableCapitalGains + taxData.grossedUpNonEligibleDividends;
         taxData.oasClawback = this.getOASclawback(taxData.totalIncomeForTaxPurposes, taxData.OAS);
         taxData.netIncomeForTaxPurposes = taxData.totalIncomeForTaxPurposes - taxData.oasClawback;
@@ -1080,6 +1079,42 @@ class FederalTaxCalculations {
         taxData.netFederalTax = taxData.federalTaxBeforeCredits - fedTaxCredits;
 
         return taxData.netFederalTax;
+    }
+
+    /**
+     * 
+     * @param {Number} dividends 
+     * @returns {Number}
+     */
+    getGrossedUpEligibleDividends(dividends) {
+        return this.fedTaxRates.dividendGrossUp * dividends;
+    }
+
+    /**
+     * 
+     * @param {Number} dividends 
+     * @returns {Number}
+     */
+    getGrossedUpNonEligibleDividends(dividends) {
+        return this.fedTaxRates.nonEligibleDividendGrossUp * dividends;
+    }
+
+    /**
+     * 
+     * @param {Number} gains 
+     * @returns {Number}
+     */
+    getTaxableCapitalGains(gains) {
+        return CanadianTaxUtils.calculateTaxInBracket(this.fedTaxRates.capitalGainsInfo, gains);
+    }
+
+    /**
+     * 
+     * @param {Number} gross 
+     * @returns {Number}
+     */
+    getMarginalTaxRate(gross) {
+        return CanadianTaxUtils.getMarginalTaxRate(this.fedTaxRates.taxBracketInfo, gross);
     }
 
     /**
@@ -1113,7 +1148,7 @@ class FederalTaxCalculations {
         taxData.fedMedicalExpenseCreditAmount = this.getFederalMedicalExpenseCredit(taxData);
         taxData.totalNonRefundableFedTaxCredits = taxData.AdjustedBPA + taxData.federalAgeCredit + taxData.fedEligiblePensionIncome + taxData.fedMedicalExpenseCreditAmount;
         taxData.fedDonationsTaxCredit = CanadianTaxUtils.calculateTaxInBracket(this.fedTaxRates.charityBrackets, taxData.charitableDonations);
-        const lowestTaxRate = CanadianTaxUtils.getMarginalTaxRate(this.fedTaxRates.taxBracketInfo, 0);
+        const lowestTaxRate = this.getMarginalTaxRate(0);
         taxData.totalFedNonRefundableTaxCreditsBeforeDividendTaxCredits = taxData.totalNonRefundableFedTaxCredits * lowestTaxRate + taxData.fedDonationsTaxCredit;
         const dividendTaxCredits = taxData.grossedUpEligibleDividends * this.fedTaxRates.eligibleDividendTaxCreditRate;
         const nonEligibleDividendTaxCredits = taxData.grossedUpNonEligibleDividends * this.fedTaxRates.nonEligibleDividendTaxCreditRate;
