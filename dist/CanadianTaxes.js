@@ -914,7 +914,7 @@ class ProvincialTaxCalculations {
      * 
      * @param {Number} taxYear 
      * @param {Number} inflation 
-     * @param {object} provincialTaxClass
+     * @param {Object} provincialTaxClass
      */
     constructor(taxYear, inflation, provincialTaxClass) {
         this.provincialTaxClass = provincialTaxClass;
