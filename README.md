@@ -20,9 +20,11 @@
   * Age credits
   * Capital gains
   * Eligible Canadian Dividends
+  * Non Eligible Canadian Dividends
   * OAS clawbacks
   * Pension credit eligible income
   * Medical Expenses
+  * Charitable Donations
 
 
 ## Installing
