@@ -5,6 +5,7 @@
  * @customfunction
  */
 function TEST_CANTAX() {
+    /** @type {any[][]} */
     const TestCantaxData = [
         ["Tax Year", "Age", "Net Income", "Expected Gross Taxable Income", "Dividends Eligible for Enhanced Tax Credit", "Dividends (non elibible)", "Eligible Capital Gains", "OAS", "Pension Credit Eligible Income", "Medical Expenses", "Charitable Donations", "Inflation"],
         [2024, 59, 180000.00, 300244.00, 5000.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
