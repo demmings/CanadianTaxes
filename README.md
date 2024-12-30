@@ -15,8 +15,8 @@
 * A Google Sheets custom function used for doing retirement income projections and taking Canadian taxes into the equation.
 * Take a column of **NET INCOMES** and calculate as accurately as possible the amount of **GROSS INCOMES** that would be required in **Canada** (and **ONTARIO**) to have the required net income.
 * There is also the option of doing the opposite on finding net incomes from gross incomes.
-* The factors taken into consideration for finding gross/net income:
-  * Regular taxable income (like RRSP, CPP, OAS,...)
+* The factors taken into consideration for finding gross income:
+  * Net income 
   * Age credits
   * Capital gains
   * Eligible Canadian Dividends
@@ -165,7 +165,6 @@ Results ==>  **58,824.22**
     *   I have coded the js so it should be fairly easy to extended support for other provinces.
 *  Only 2024, 2025 tax brackets currently entered.
    *  However, even if this data is not updated and you use in a later year (e.g. 2030) - the tax brackets will be adjusted for inflation from last known (in this case 2025).  
-*  Only a single year of tax rates are supported - it would be nice to handle this years and next (if known) -  future expansion.
 *  Spousal returns are not calculated.
 *  Many special credits that many affect your total tax bill are not calculated (at this time).
 *  
