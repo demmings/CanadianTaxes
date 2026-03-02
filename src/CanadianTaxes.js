@@ -69,6 +69,7 @@ function TEST_CANTAX() {
         [2025, 69, 80000.00, 134703.39, 50000.00, 0.00, 2000.00, 9416.00, 2000.00, 4000.00, 0.00, 0.00],
         [2025, 69, 80000.00, 151573.21, 50000.00, 20000.00, 2000.00, 9416.00, 2000.00, 4000.00, 0.00, 0.00],
         [2025, 69, 80000.00, 150741.91, 50000.00, 20000.00, 2000.00, 9416.00, 2000.00, 4000.00, 1000.00, 0.00],
+        [2026, 62, 50000.00, 59498.39912, 5000.00, 0.00, 2000.00, 0.00, 2000.00, 4000.00, 0.00, 0.00],
         [2030, 69, 80000.00, 150741.91, 50000.00, 20000.00, 2000.00, 9416.00, 2000.00, 4000.00, 1000.00, 0.00],
         [2030, 69, 80000.00, 144041.87, 50000.00, 20000.00, 2000.00, 9416.00, 2000.00, 4000.00, 1000.00, 2.00]
     ];
@@ -399,6 +400,60 @@ class FederalTaxRates2025 {
 }
 
 /**
+ * @classdesc - Federal tax rates for 2025
+ */
+class FederalTaxRates2026 {
+    constructor() {
+        this.taxYear = FederalTaxRates2026.year();
+        this._dividendGrossUp = 0.38;
+        this.eligibleDividendTaxCreditRate = 0.150198;
+        this._nonEligibleDividendGrossUp = 0.15;
+        this.nonEligibleDividendTaxCreditRate = 0.090301;
+        this.basicPersonAmount = 16452.00;
+        this.additionalBasicPersonalAmount = 1590;
+        this.additionalBpaThreshold = 177882;
+        this.bpaReductionPercent = 0.021061;
+        this.ageCreditAge = 65;
+        this.ageAmount = 9028.00;
+        this.ageThreshold = 45522.00;
+        this.ageExcessPercent = 0.15;
+        this.maxIncomePensionTaxCredit = 2000;
+        this.OASclawbackThreshold = 90997;
+        this.OASclawbackRate = 0.15;
+        this.medicalExpenseThreshold = 2833;
+        this.medicalExpenseThresholdPercent = 0.03;
+
+        /**
+         * @type {BracketObject}
+         */
+        this.capitalGainsInfo = {
+            brackets: [0, 250000],
+            rates: [0.5, 0.666666],
+            base: [0, 125000]
+        };
+
+        /**
+         * @type {BracketObject}
+         */
+        this.taxBracketInfo = {
+            brackets: [0, 58523, 117045, 181440, 258482],
+            rates: [0.14, 0.205, 0.26, 0.29, 0.33],
+            base: [0, 0, 0, 0, 0]
+        };
+
+        this.taxBracketInfo.base = FederalTaxes.calcuateBracketBaseTaxAmounts(this.taxBracketInfo.brackets, this.taxBracketInfo.rates);
+    }
+
+    /**
+     * Object can be queried for tax year supported.
+     * @returns {Number}
+     */
+    static year() {
+        return 2026;
+    }
+}
+
+/**
  * @classdesc - All relevant Ontario tax rates for indicated tax year.
  * Add each new year of tax rates to ONTARIO_TAX_YEARS below
  */
@@ -523,6 +578,64 @@ class OntarioTaxRates2025 {
     }
 }
 
+/**
+ * @classdesc - All relevant Ontario tax rates for indicated tax year.
+ */
+class OntarioTaxRates2026 {
+    constructor() {
+
+        this.taxYear = OntarioTaxRates2026.year();  // Change static when copy/pasta to a new year
+        this.provEligibleDividendTaxCreditRate = 0.10;
+        this.provNonEligibleDividendTaxCreditRate = 0.029863;
+        this.ontBasicPersonAmount = 12989.00;
+        this.ageCreditAge = 65;
+        this.ontAgeAmount = 6223.00;
+        this.ontAgeThreshold = 46330.00;
+        this.ageExcessPercent = 0.15;
+        this.provMaxIncomePensionTaxCredit = 1762.00;
+        this.OASclawbackThreshold = 90997;
+        this.OASclawbackRate = 0.15;
+        this.medicalExpenseThreshold = 2885;
+        this.medicalExpenseThresholdPercent = 0.03;
+
+        /**
+         * @type {BracketObject}
+         */
+        this.ontHealthBracketInfo = {
+            brackets: [0, 25000, 38500, 48600, 72600, 200600],
+            base: [0, 300, 450, 600, 750, 900],
+            rates: [0, 0, 0, 0, 0, 0]
+        };
+
+        /**
+         * @type {BracketObject}
+         */
+        this.ontSurtaxBracketInfo = {
+            brackets: [0, 5818, 7446],
+            rates: [0, 0.2, 0.56],
+            base: [0, 0, 319.4],
+        };
+
+        /**
+        * @type {BracketObject}
+        */
+        this.ontTaxBracketInfo = {
+            brackets: [0, 53891, 107785, 150000, 220000],
+            rates: [0.0505, 0.0915, 0.1116, 0.1216, 0.1316],
+            base: [0, 0, 0, 0, 0]
+        };
+        this.ontTaxBracketInfo.base = FederalTaxes.calcuateBracketBaseTaxAmounts(this.ontTaxBracketInfo.brackets, this.ontTaxBracketInfo.rates);
+    }
+
+    /**
+     * Object can be queried for tax year supported.
+     * @returns {Number}
+     */
+    static year() {
+        return 2026;        //  Update on new tax year
+    }
+}
+
 class FederalTaxes extends FederalTaxRates2024 {
     //  Basic personal amounts, tax brackets adjusted for inflation in future years.
     constructor(taxYear, inflation) {
@@ -555,7 +668,8 @@ class FederalTaxes extends FederalTaxRates2024 {
         const FEDERAL_TAX_YEARS =
             [
                 FederalTaxRates2024,
-                FederalTaxRates2025
+                FederalTaxRates2025,
+                FederalTaxRates2026
             ];
 
         let obj = FEDERAL_TAX_YEARS[FEDERAL_TAX_YEARS.length - 1];
@@ -617,7 +731,8 @@ class OntarioTaxes extends OntarioTaxRates2024 {
         const ONTARIO_TAX_YEARS =
             [
                 OntarioTaxRates2024,
-                OntarioTaxRates2025
+                OntarioTaxRates2025,
+                OntarioTaxRates2026
             ];
 
         let obj = ONTARIO_TAX_YEARS[ONTARIO_TAX_YEARS.length - 1];
