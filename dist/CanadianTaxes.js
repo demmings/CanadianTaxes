@@ -40,8 +40,8 @@ function TEST_CANTAX() {
         [2025, 69, 80000.00, 151573.21, 50000.00, 20000.00, 2000.00, 9416.00, 2000.00, 4000.00, 0.00, 0.00],
         [2025, 69, 80000.00, 150741.91, 50000.00, 20000.00, 2000.00, 9416.00, 2000.00, 4000.00, 1000.00, 0.00],
         [2026, 62, 50000.00, 58983.04, 5000.00, 0.00, 2000.00, 0.00, 2000.00, 4000.00, 0.00, 0.00],
-        [2030, 69, 80000.00, 150741.91, 50000.00, 20000.00, 2000.00, 9416.00, 2000.00, 4000.00, 1000.00, 0.00],
-        [2030, 69, 80000.00, 144041.87, 50000.00, 20000.00, 2000.00, 9416.00, 2000.00, 4000.00, 1000.00, 2.00]
+        [2030, 69, 80000.00, 149200.67, 50000.00, 20000.00, 2000.00, 9416.00, 2000.00, 4000.00, 1000.00, 0.00],
+        [2030, 69, 80000.00, 143740.79, 50000.00, 20000.00, 2000.00, 9416.00, 2000.00, 4000.00, 1000.00, 2.00]
     ];
 
     const calcColums = ["Gross Income (calculated)", "Gross Diff", "Pass/Fail", "Net Income (calculated)", "Net Diff", "Pass/Fail", "Taxes"];
@@ -122,6 +122,23 @@ function TEST_CANTAX() {
         output.push([...testItem, ...calculatedData]);
     }
     Logger.log("-----------------------------------");
+
+    let yearlyIncome = 10000;
+    let adjustedIncome = CanadianIncomeCalculator.prepTaxInput(5, 2, yearlyIncome);
+    const expectedAdjusted = [10000, 10200, 10404, 10612.08, 10824.3216];
+    if (JSON.stringify(adjustedIncome) !== JSON.stringify(expectedAdjusted)) {
+        Logger.log("prepTaxInput(1) -->  FAIL");
+        systemStatus = false;
+    }
+
+    let yearlyIncome2 = [['2'], ['4'], ['6'], ['8'], ['10']];
+    let adjustedIncome2 = CanadianIncomeCalculator.prepTaxInput(5, 2, yearlyIncome2);
+    const expectedAdjusted2 = [2, 4, 6, 8, 10];
+    if (JSON.stringify(adjustedIncome2) !== JSON.stringify(expectedAdjusted2)) {
+        Logger.log("prepTaxInput(2) -->  FAIL");
+        systemStatus = false;
+    }
+
     if (systemStatus) {
         Logger.log("SYSTEM TEST -->  SUCCESS");
     }
@@ -642,7 +659,7 @@ class FederalTaxes extends FederalTaxRates2024 {
                 FederalTaxRates2026
             ];
 
-        let obj = FEDERAL_TAX_YEARS[FEDERAL_TAX_YEARS.length - 1];
+        let obj = FEDERAL_TAX_YEARS.at(-1);
         for (const fedTaxObject of FEDERAL_TAX_YEARS) {
             if (year <= fedTaxObject.year()) {
                 obj = fedTaxObject;
@@ -650,6 +667,7 @@ class FederalTaxes extends FederalTaxRates2024 {
             }
         }
 
+        // @ts-ignore
         Object.assign(this, new obj());
     }
 
@@ -705,8 +723,7 @@ class OntarioTaxes extends OntarioTaxRates2024 {
                 OntarioTaxRates2026
             ];
 
-        let obj = ONTARIO_TAX_YEARS[ONTARIO_TAX_YEARS.length - 1];
-
+        let obj = ONTARIO_TAX_YEARS.at(-1);
         for (const fedTaxObject of ONTARIO_TAX_YEARS) {
             if (year <= fedTaxObject.year()) {
                 obj = fedTaxObject;
@@ -714,6 +731,7 @@ class OntarioTaxes extends OntarioTaxRates2024 {
             }
         }
 
+        // @ts-ignore
         Object.assign(this, new obj());
     }
 
@@ -861,7 +879,7 @@ class CanadianIncomeCalculator {
         const charitableDonations = CanadianIncomeCalculator.prepTaxInput(items, inflation, donations);
         const guessOfCurrentAge = Array.isArray(ageInFuture) ? ageInFuture[0] : ageInFuture;
         const currentAge = age === null ? guessOfCurrentAge : Number(age);
-        const year = taxYear === null || taxYear === '' || typeof taxYear === 'undefined' ? new Date().getFullYear() : Number(taxYear);
+        const year = taxYear === null || taxYear === '' || taxYear === undefined ? new Date().getFullYear() : Number(taxYear);
 
         const taxData = { incomes, ageInFuture, currentAge, year, inflation, capitalGains, eligibleDividends, OAS, incomeEligibleForPensionCredit, medicalExpenses, nonEligibleDividends, charitableDonations, debug };
 
@@ -904,7 +922,7 @@ class CanadianIncomeCalculator {
     static prepTaxInput(items, inflation, val) {
         let taxProperty = [];
         if (Array.isArray(val)) {
-            taxProperty = CanadianTaxUtils.convertRowsToSingleArray(val).map(inc => Number(inc));
+            taxProperty = CanadianTaxUtils.convertRowsToSingleArray(val).map(Number);
         }
         else {
             let startVal = val === null ? 0 : Number(val);
@@ -1108,10 +1126,7 @@ class ProvincialTaxCalculations {
      * @returns {Number}
      */
     getProvincialTaxCredits(taxData, grossIncome) {
-        taxData.provincialEligiblePensionIncome = taxData.incomeEligibleForPensionCredit > this.provTaxRates.provMaxIncomePensionTaxCredit
-            ? this.provTaxRates.provMaxIncomePensionTaxCredit
-            : taxData.incomeEligibleForPensionCredit;
-
+        taxData.provincialEligiblePensionIncome = Math.min(taxData.incomeEligibleForPensionCredit, this.provTaxRates.provMaxIncomePensionTaxCredit);
         taxData.provAgeCredit = this.getAgeCredit(taxData.ageInFuture, grossIncome + taxData.grossedUpEligibleDividends, this.provTaxRates.ontAgeAmount, this.provTaxRates.ontAgeThreshold, this.provTaxRates.ageExcessPercent);
         taxData.provincialMedicalExpenseCredit = this.getMedicalExpenseCredit(taxData);
         taxData.provAdjustedBPA = this.getBasicPersonalAmount(taxData);
@@ -1232,13 +1247,11 @@ class ProvincialTaxCalculations {
      */
     getMedicalExpenseCredit(taxData) {
         let thresholdValue = taxData.netIncomeForTaxPurposes * this.provTaxRates.medicalExpenseThresholdPercent;
-        thresholdValue = this.provTaxRates.medicalExpenseThreshold < thresholdValue
-            ? this.provTaxRates.medicalExpenseThreshold
-            : thresholdValue;
+        thresholdValue = Math.min(thresholdValue, this.provTaxRates.medicalExpenseThreshold);
 
         const medicalExpenseCreditAmount = taxData.medicalExpenses - thresholdValue;
 
-        return medicalExpenseCreditAmount <= 0 ? 0 : medicalExpenseCreditAmount;
+        return Math.max(medicalExpenseCreditAmount, 0);
     }
 }
 
@@ -1334,7 +1347,7 @@ class FederalTaxCalculations {
 
         if (income > this.fedTaxRates.OASclawbackThreshold) {
             clawback = (income - this.fedTaxRates.OASclawbackThreshold) * this.fedTaxRates.OASclawbackRate;
-            clawback = clawback >= OAS ? OAS : clawback;
+            clawback = Math.min(clawback, OAS);
         }
         return clawback;
     }
@@ -1379,9 +1392,7 @@ class FederalTaxCalculations {
      * @returns {Number}
      */
     getEligiblePensionIncome(incomeEligibleForPensionCredit) {
-        return incomeEligibleForPensionCredit > this.fedTaxRates.maxIncomePensionTaxCredit
-            ? this.fedTaxRates.maxIncomePensionTaxCredit
-            : incomeEligibleForPensionCredit;
+        return Math.min(incomeEligibleForPensionCredit, this.fedTaxRates.maxIncomePensionTaxCredit);
     }
 
     /**
@@ -1438,13 +1449,11 @@ class FederalTaxCalculations {
      */
     getFederalMedicalExpenseCredit(taxData) {
         let thresholdValue = taxData.netIncomeForTaxPurposes * this.fedTaxRates.medicalExpenseThresholdPercent;
-        thresholdValue = this.fedTaxRates.medicalExpenseThreshold < thresholdValue
-            ? this.fedTaxRates.medicalExpenseThreshold
-            : thresholdValue;
+        thresholdValue = Math.min(thresholdValue, this.fedTaxRates.medicalExpenseThreshold);
 
         const medicalExpenseCreditAmount = taxData.medicalExpenses - thresholdValue;
 
-        return medicalExpenseCreditAmount <= 0 ? 0 : medicalExpenseCreditAmount;
+        return Math.max(0, medicalExpenseCreditAmount);
     }
 
     /**
@@ -1567,6 +1576,31 @@ class CanadianTaxUtils {
         }
         return 0;
     }
+}
+
+/**
+ * How much tax is held at source when making RRSP withdrawal.
+ * @param {Number} amountWithdrawn 
+ * @returns {Number}
+ * @customfunction
+ */
+function GET_RRSP_WITHOLDING_TAX(amountWithdrawn) {
+    return amountWithdrawn * getWitholdingTaxRate(amountWithdrawn);
+}
+
+/**
+ * Return RRSP withdrawal tax with held percentage.
+ * @param {Number} amountWithdrawn 
+ * @returns {Number}
+ * @customfunction
+ */
+function getWitholdingTaxRate(amountWithdrawn) {
+    if (amountWithdrawn <= 5000)
+        return 0.1;
+    else if (amountWithdrawn > 15000)
+        return 0.3;
+    else
+        return 0.2;
 }
 
 
