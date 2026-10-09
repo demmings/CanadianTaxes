@@ -123,16 +123,16 @@ function TEST_CANTAX() {
     }
     Logger.log("-----------------------------------");
 
-    let yearlyIncome = 10000;
-    let adjustedIncome = CanadianIncomeCalculator.prepTaxInput(5, 2, yearlyIncome);
+    const yearlyIncome = 10000;
+    const adjustedIncome = CanadianIncomeCalculator.prepTaxInput(5, 2, yearlyIncome);
     const expectedAdjusted = [10000, 10200, 10404, 10612.08, 10824.3216];
     if (JSON.stringify(adjustedIncome) !== JSON.stringify(expectedAdjusted)) {
         Logger.log("prepTaxInput(1) -->  FAIL");
         systemStatus = false;
     }
 
-    let yearlyIncome2 = [['2'], ['4'], ['6'], ['8'], ['10']];
-    let adjustedIncome2 = CanadianIncomeCalculator.prepTaxInput(5, 2, yearlyIncome2);
+    const yearlyIncome2 = [['2'], ['4'], ['6'], ['8'], ['10']];
+    const adjustedIncome2 = CanadianIncomeCalculator.prepTaxInput(5, 2, yearlyIncome2);
     const expectedAdjusted2 = [2, 4, 6, 8, 10];
     if (JSON.stringify(adjustedIncome2) !== JSON.stringify(expectedAdjusted2)) {
         Logger.log("prepTaxInput(2) -->  FAIL");
