@@ -290,7 +290,7 @@ class FederalTaxRates2024 {
          */
         this.capitalGainsInfo = {
             brackets: [0, 250000],
-            rates: [0.5, 0.666666],
+            rates: [0.5, 0.5],
             base: [0, 125000]
         };
 
