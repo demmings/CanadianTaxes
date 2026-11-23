@@ -68,10 +68,10 @@ function TEST_CANTAX() {
         [2025, 70, 50000.00, 58020.21, 5000.00, 0.00, 2000.00, 9416.00, 2000.00, 4000.00, 0.00, 0.00],
         [2025, 69, 80000.00, 134703.39, 50000.00, 0.00, 2000.00, 9416.00, 2000.00, 4000.00, 0.00, 0.00],
         [2025, 69, 80000.00, 151573.21, 50000.00, 20000.00, 2000.00, 9416.00, 2000.00, 4000.00, 0.00, 0.00],
-        [2025, 69, 80000.00, 150741.91, 50000.00, 20000.00, 2000.00, 9416.00, 2000.00, 4000.00, 1000.00, 0.00],
-        [2026, 62, 50000.00, 58983.04, 5000.00, 0.00, 2000.00, 0.00, 2000.00, 4000.00, 0.00, 0.00],
-        [2030, 69, 80000.00, 149213.03, 50000.00, 20000.00, 2000.00, 9416.00, 2000.00, 4000.00, 1000.00, 0.00],
-        [2030, 69, 80000.00, 143740.79, 50000.00, 20000.00, 2000.00, 9416.00, 2000.00, 4000.00, 1000.00, 2.00]
+        [2025, 69, 80000.00, 150743.92, 50000.00, 20000.00, 2000.00, 9416.00, 2000.00, 4000.00, 1000.00, 0.00],
+        [2026, 62, 50000.00, 58980.58, 5000.00, 0.00, 2000.00, 0.00, 2000.00, 4000.00, 0.00, 0.00],
+        [2026, 65, 300000.00, 620587, 50000.00, 20000.00, 2000.00, 9416.00, 2000.00, 4000.00, 1000.00, 0.00],
+        [2030, 69, 80000.00, 143743.59, 50000.00, 20000.00, 2000.00, 9416.00, 2000.00, 4000.00, 1000.00, 2.00]
     ];
 
     const calcColums = ["Gross Income (calculated)", "Gross Diff", "Pass/Fail", "Net Income (calculated)", "Net Diff", "Pass/Fail", "Taxes"];
@@ -365,35 +365,20 @@ class FederalTaxRates2024 {
 /**
  * @classdesc - Federal tax rates for 2025
  */
-class FederalTaxRates2025 {
+class FederalTaxRates2025 extends FederalTaxRates2024 {
     constructor() {
+        super();
         this.taxYear = FederalTaxRates2025.year();
-        this._dividendGrossUp = 0.38;
         this.eligibleDividendTaxCreditRate = 0.150198;
-        this._nonEligibleDividendGrossUp = 0.15;
         this.nonEligibleDividendTaxCreditRate = 0.090301;
         this.basicPersonAmount = 16129.00;
         this.additionalBasicPersonalAmount = 1590;
         this.additionalBpaThreshold = 177882;
         this.bpaReductionPercent = 0.021061;
-        this.ageCreditAge = 65;
         this.ageAmount = 9028.00;
         this.ageThreshold = 45522.00;
-        this.ageExcessPercent = 0.15;
-        this.maxIncomePensionTaxCredit = 2000;
-        this.OASclawbackThreshold = 90997;
-        this.OASclawbackRate = 0.15;
+        this.OASclawbackThreshold = 93454;
         this.medicalExpenseThreshold = 2833;
-        this.medicalExpenseThresholdPercent = 0.03;
-
-        /**
-         * @type {BracketObject}
-         */
-        this.capitalGainsInfo = {
-            brackets: [0, 250000],
-            rates: [0.5, 0.5],
-            base: [0, 125000]
-        };
 
         /**
          * @type {BracketObject}
@@ -403,8 +388,17 @@ class FederalTaxRates2025 {
             rates: [0.145, 0.205, 0.26, 0.29, 0.33],
             base: [0, 0, 0, 0, 0]
         };
-
         this.taxBracketInfo.base = FederalTaxes.calcuateBracketBaseTaxAmounts(this.taxBracketInfo.brackets, this.taxBracketInfo.rates);
+
+            /**
+         * @type {BracketObject}
+         */
+        this.charityBrackets = {
+            brackets: [0, 200],
+            rates: [0.145, 0.29],
+            base: [0, 0]
+        }
+        this.charityBrackets.base = FederalTaxes.calcuateBracketBaseTaxAmounts(this.charityBrackets.brackets, this.charityBrackets.rates);
     }
 
     /**
@@ -419,35 +413,20 @@ class FederalTaxRates2025 {
 /**
  * @classdesc - Federal tax rates for 2025
  */
-class FederalTaxRates2026 {
+class FederalTaxRates2026 extends FederalTaxRates2025 {
     constructor() {
+        super();
         this.taxYear = FederalTaxRates2026.year();
-        this._dividendGrossUp = 0.38;
         this.eligibleDividendTaxCreditRate = 0.150198;
-        this._nonEligibleDividendGrossUp = 0.15;
         this.nonEligibleDividendTaxCreditRate = 0.090301;
         this.basicPersonAmount = 16452.00;
-        this.additionalBasicPersonalAmount = 1590;
-        this.additionalBpaThreshold = 177882;
+        this.additionalBasicPersonalAmount = 1623;
+        this.additionalBpaThreshold = 181440;
         this.bpaReductionPercent = 0.021061;
-        this.ageCreditAge = 65;
-        this.ageAmount = 9028.00;
-        this.ageThreshold = 45522.00;
-        this.ageExcessPercent = 0.15;
-        this.maxIncomePensionTaxCredit = 2000;
-        this.OASclawbackThreshold = 90997;
-        this.OASclawbackRate = 0.15;
-        this.medicalExpenseThreshold = 2833;
-        this.medicalExpenseThresholdPercent = 0.03;
-
-        /**
-         * @type {BracketObject}
-         */
-        this.capitalGainsInfo = {
-            brackets: [0, 250000],
-            rates: [0.5, 0.5],
-            base: [0, 125000]
-        };
+        this.ageAmount = 9208.00;
+        this.ageThreshold = 46432.00;
+        this.OASclawbackThreshold = 95323;
+        this.medicalExpenseThreshold = 2891;
 
         /**
          * @type {BracketObject}
@@ -457,8 +436,17 @@ class FederalTaxRates2026 {
             rates: [0.14, 0.205, 0.26, 0.29, 0.33],
             base: [0, 0, 0, 0, 0]
         };
-
         this.taxBracketInfo.base = FederalTaxes.calcuateBracketBaseTaxAmounts(this.taxBracketInfo.brackets, this.taxBracketInfo.rates);
+        
+        /**
+         * @type {BracketObject}
+         */
+        this.charityBrackets = {
+            brackets: [0, 200],
+            rates: [0.14, 0.29],
+            base: [0, 0]
+        }
+        this.charityBrackets.base = FederalTaxes.calcuateBracketBaseTaxAmounts(this.charityBrackets.brackets, this.charityBrackets.rates);
     }
 
     /**
@@ -540,31 +528,17 @@ class OntarioTaxRates2024 {
 /**
  * @classdesc - All relevant Ontario tax rates for indicated tax year.
  */
-class OntarioTaxRates2025 {
+class OntarioTaxRates2025 extends OntarioTaxRates2024 {
     constructor() {
+        super();
 
         this.taxYear = OntarioTaxRates2025.year();  // Change static when copy/pasta to a new year
-        this.provEligibleDividendTaxCreditRate = 0.10;
-        this.provNonEligibleDividendTaxCreditRate = 0.029863;
         this.ontBasicPersonAmount = 12747.00;
-        this.ageCreditAge = 65;
         this.ontAgeAmount = 6223.00;
         this.ontAgeThreshold = 46330.00;
-        this.ageExcessPercent = 0.15;
         this.provMaxIncomePensionTaxCredit = 1762.00;
         this.OASclawbackThreshold = 90997;
-        this.OASclawbackRate = 0.15;
         this.medicalExpenseThreshold = 2885;
-        this.medicalExpenseThresholdPercent = 0.03;
-
-        /**
-         * @type {BracketObject}
-         */
-        this.ontHealthBracketInfo = {
-            brackets: [0, 25000, 38500, 48600, 72600, 200600],
-            base: [0, 300, 450, 600, 750, 900],
-            rates: [0, 0, 0, 0, 0, 0]
-        };
 
         /**
          * @type {BracketObject}
@@ -598,31 +572,17 @@ class OntarioTaxRates2025 {
 /**
  * @classdesc - All relevant Ontario tax rates for indicated tax year.
  */
-class OntarioTaxRates2026 {
+class OntarioTaxRates2026 extends OntarioTaxRates2025 {
     constructor() {
+        super();
 
         this.taxYear = OntarioTaxRates2026.year();  // Change static when copy/pasta to a new year
-        this.provEligibleDividendTaxCreditRate = 0.10;
-        this.provNonEligibleDividendTaxCreditRate = 0.029863;
         this.ontBasicPersonAmount = 12989.00;
-        this.ageCreditAge = 65;
-        this.ontAgeAmount = 6223.00;
-        this.ontAgeThreshold = 46330.00;
-        this.ageExcessPercent = 0.15;
-        this.provMaxIncomePensionTaxCredit = 1762.00;
+        this.ontAgeAmount = 6342.00;
+        this.ontAgeThreshold = 47210.00;
+        this.provMaxIncomePensionTaxCredit = 1796.00;
         this.OASclawbackThreshold = 90997;
-        this.OASclawbackRate = 0.15;
-        this.medicalExpenseThreshold = 2885;
-        this.medicalExpenseThresholdPercent = 0.03;
-
-        /**
-         * @type {BracketObject}
-         */
-        this.ontHealthBracketInfo = {
-            brackets: [0, 25000, 38500, 48600, 72600, 200600],
-            base: [0, 300, 450, 600, 750, 900],
-            rates: [0, 0, 0, 0, 0, 0]
-        };
+        this.medicalExpenseThreshold = 2940;
 
         /**
          * @type {BracketObject}
